@@ -6,6 +6,7 @@ function createFloor() {
         // wireframe: true
     });
     var floor = new THREE.Mesh(geometry, material);
+    floor.receiveShadow = true;
     floor.rotation.x = -Math.PI / 2;
     return floor;
 }

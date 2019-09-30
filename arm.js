@@ -16,12 +16,15 @@ function createRoboticArm(base) {
     createBox(baseHand, 0.1, 0.5, 0.1, 0.2, (0.4 + 0.05) * 0.5, 0);
     createBox(baseHand, 0.1, 0.5, 0.1, -0.2, (0.4 + 0.05) * 0.5, 0);
 
+    mainJoint.castShadow = true;
+
 
 
     // Helper functions
     function createArm(obj, width, length) {
         var armGeometry = new THREE.BoxBufferGeometry(width, length, width);
         var arm = new THREE.Mesh(armGeometry, material);
+        arm.castShadow = true;
         arm.position.y = length * 0.5;
         obj.add(arm);
         return arm;

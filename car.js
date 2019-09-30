@@ -2,6 +2,7 @@ let base;
 let wheels = [];
 
 function createCar() {
+    // 8x4 car with 0.5 radius wheels
     var geometry = new THREE.BoxBufferGeometry(8, 0.2, 4);
     var material = new THREE.MeshLambertMaterial({
         flatShading: true,
@@ -10,6 +11,8 @@ function createCar() {
     });
     base = new THREE.Mesh(geometry, material);
     base.position.y = 1 + 0.1;
+    base.castShadow = true;
+    base.receiveShadow = true;
 
     createWheel(base, 3.5, -0.5, 1.5);
     createWheel(base, 3.5, -0.5, -1.5);
@@ -32,6 +35,8 @@ function createWheel(obj, x, y, z) {
     mesh.position.x = x;
     mesh.position.y = y;
     mesh.position.z = z;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
 
     obj.add(mesh)
     wheels.push(mesh);
@@ -47,6 +52,7 @@ function createBase(obj) {
     var base = new THREE.Mesh(geometry, material);
     base.position.y = 0.1;
     base.side = THREE.DoubleSide;
+    base.receiveShadow = true;
     obj.add(base);
     return base;
 }
