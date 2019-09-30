@@ -1,7 +1,7 @@
 // CG project - JCoutinho 89470, JPorto 89472 and MNeves 89512
 
 // Three js objects
-var camera, scene, renderer;
+var camera, scene, renderer, light;
 
 // Scene objects
 var car, floor, axesHelper;
@@ -19,13 +19,13 @@ function init() {
 
     // camera
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.x = -6;
-    camera.position.y = 6;
-    camera.position.z = 10;
+    camera.position.x = -5;
+    camera.position.y = 10;
+    camera.position.z = 5;
     camera.lookAt(scene.position);
 
     // lights
-    var light = new THREE.PointLight(0xffffff, 3, 500);
+    light = new THREE.PointLight(0xffffff, 1, 100);
     light.position.set(camera.position.x * 1.2, camera.position.y * 1.2, camera.position.z * 1.2);
     scene.add(light);
 
@@ -52,10 +52,14 @@ function animate() {
 
     //car.position.x += 0.01;
     //car.position.y += 0.01;
+    light.position.x = Math.cos(step * 0.1) * (camera.position.x * 1.2)
+    light.position.z = Math.sin(step * 0.1) * (camera.position.z * 1.2)
+    //  light.intensity = Math.sin(step*0.8) > 0 ? 2 : 0;
+    //camera.position.z = Math.cos(step) * (camera.position.z * 1.2);
 
-    camera.rotation.x = -6 * Math.cos(step)
-    camera.rotation.z = 6 * Math.cos(step);
-    step += 0.01;
+    //    camera.rotation.x = -6 * Math.cos(step);
+    //    camera.rotation.z = 6 * Math.cos(step);
+    step += 0.5;
     camera.lookAt(scene.position);
 
 
