@@ -1,10 +1,22 @@
 // CG project - JCoutinho 89470, JPorto 89472 and MNeves 89512
 
 // Three js objects
-var camera, scene, renderer, light;
+let camera, scene, renderer, light;
 
 // Scene objects
-var car, floor, axesHelper;
+let car, floor, axesHelper;
+
+// Control flags
+let rotateMainZPos = false,
+    rotateMainZNeg = false,
+    rotateMainXPos = false,
+    rotateMainXNeg = false,
+    rotateSecZPos = false,
+    rotateSecZNeg = false,
+    rotateSecXPos = false,
+    rotateSecXNeg = false,
+    moveXPos = false,
+    moveXNeg = false;
 
 var step = 0,
     car_wireframe = false;
@@ -44,7 +56,8 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     window.addEventListener("resize", onResize);
-    window.addEventListener("keydown", onKeyPress);
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
 }
 
 function animate() {
@@ -63,20 +76,115 @@ function animate() {
     camera.lookAt(scene.position);
 
 
-
+    handleControls();
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
 
 }
 
-function onKeyPress(e) {
+function handleControls() {
+    // Main joint
+    if (rotateMainZPos)
+        rotateMain("z", 0.5);
+    if (rotateMainZNeg)
+        rotateMain("z", -0.5);
+    if (rotateMainXPos)
+        rotateMain("x", 0.5);
+    if (rotateMainXNeg)
+        rotateMain("x", -0.5);
+
+    // Secondary joint
+    if (rotateSecZPos)
+        rotateSec("z", 0.5);
+    if (rotateSecZNeg)
+        rotateSec("z", -0.5);
+    if (rotateSecXPos)
+        rotateSec("x", 0.5);
+    if (rotateSecXNeg)
+        rotateSec("x", -0.5);
+
+    // Car
+    if (moveXPos)
+        moveCar("x", 0.05);
+    if (moveXNeg)
+        moveCar("x", -0.05);
+
+}
+
+function onKeyDown(e) {
     switch (e.code) {
-        case "KeyA":
+        case "KeyW":
             toggleWireframe(car, car_wireframe);
             car_wireframe = !car_wireframe;
             break;
         case "KeyF":
+            rotateMainZPos = true;
+            break;
+        case "KeyG":
+            rotateMainZNeg = true;
+            break;
+        case "KeyV":
+            rotateMainXPos = true;
+            break;
+        case "KeyB":
+            rotateMainXNeg = true;
+            break;
+        case "KeyH":
+            rotateSecZPos = true;
+            break;
+        case "KeyJ":
+            rotateSecZNeg = true;
+            break;
+        case "KeyN":
+            rotateSecXPos = true;
+            break;
+        case "KeyM":
+            rotateSecXNeg = true;
+            break;
+        case "KeyA":
+            moveXNeg = true;
+            break;
+        case "KeyD":
+            moveXPos = true;
+            break;
 
+        default:
+            break;
+    }
+}
+
+function onKeyUp(e) {
+    switch (e.code) {
+
+        case "KeyF":
+            rotateMainZPos = false;
+            break;
+        case "KeyG":
+            rotateMainZNeg = false;
+            break;
+        case "KeyV":
+            rotateMainXPos = false;
+            break;
+        case "KeyB":
+            rotateMainXNeg = false;
+            break;
+        case "KeyH":
+            rotateSecZPos = false;
+            break;
+        case "KeyJ":
+            rotateSecZNeg = false;
+            break;
+        case "KeyN":
+            rotateSecXPos = false;
+            break;
+        case "KeyM":
+            rotateSecXNeg = false;
+            break;
+        case "KeyA":
+            moveXNeg = false;
+            break;
+        case "KeyD":
+            moveXPos = false;
             break;
 
         default:

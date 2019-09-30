@@ -1,3 +1,6 @@
+let base;
+let wheels = [];
+
 function createCar() {
     var geometry = new THREE.BoxBufferGeometry(8, 0.2, 4);
     var material = new THREE.MeshLambertMaterial({
@@ -5,17 +8,17 @@ function createCar() {
         color: 0x4083c7,
         wireframe: true
     });
-    var mesh = new THREE.Mesh(geometry, material);
-    mesh.position.y = 1 + 0.1;
+    base = new THREE.Mesh(geometry, material);
+    base.position.y = 1 + 0.1;
 
-    createWheel(mesh, 3.5, -0.5, 1.5);
-    createWheel(mesh, 3.5, -0.5, -1.5);
-    createWheel(mesh, -3.5, -0.5, 1.5);
-    createWheel(mesh, -3.5, -0.5, -1.5);
-    var base = createBase(mesh);
-    createRoboticArm(base);
+    createWheel(base, 3.5, -0.5, 1.5);
+    createWheel(base, 3.5, -0.5, -1.5);
+    createWheel(base, -3.5, -0.5, 1.5);
+    createWheel(base, -3.5, -0.5, -1.5);
+    var armBase = createBase(base);
+    createRoboticArm(armBase);
 
-    return mesh;
+    return base;
 }
 
 function createWheel(obj, x, y, z) {
@@ -31,6 +34,7 @@ function createWheel(obj, x, y, z) {
     mesh.position.z = z;
 
     obj.add(mesh)
+    wheels.push(mesh);
 }
 
 function createBase(obj) {
@@ -51,8 +55,19 @@ function toggleWireframe(obj, bool) {
     obj.material.wireframe = bool;
     obj.children.forEach(child => {
         toggleWireframe(child, bool);
-
     });
+}
 
-
+function moveCar(axis, vel) {
+    switch (axis) {
+        case "x":
+            base.position.x += vel;
+            wheels.forEach(wheel => {
+                wheel.rotation.z -= 2*vel;
+            })
+            break;
+        case "z":
+            mainJoint.position.z += vel;
+            break;
+    }
 }

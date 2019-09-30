@@ -1,3 +1,5 @@
+let mainJoint, secJoint;
+
 function createRoboticArm(base) {
     var material = new THREE.MeshLambertMaterial({
         flatShading: true,
@@ -5,14 +7,14 @@ function createRoboticArm(base) {
         wireframe: true
     });
 
-    var mainJoint = createJoint(base, 0.2, 0);
+    mainJoint = createJoint(base, 0.2, 0);
     var primaryArm = createArm(mainJoint, 0.2, 3);
-    var secJoint = createJoint(primaryArm, 0.3, 3);
+    secJoint = createJoint(primaryArm, 0.3, 3);
     var secArm = createArm(secJoint, 0.1, 2);
     var endJoint = createJoint(secArm, 0.05, 2);
-    var baseHand = createBox(endJoint, 0.4, 0.05, 0.4, 0, 0, 0);
-    createBox(baseHand, 0.1, 0.4, 0.4, 0.2, (0.4 + 0.05) * 0.5, 0);
-    createBox(baseHand, 0.1, 0.4, 0.4, -0.2, (0.4 + 0.05) * 0.5, 0);
+    var baseHand = createBox(endJoint, 0.5, 0.05, 0.1, 0, 0, 0);
+    createBox(baseHand, 0.1, 0.5, 0.1, 0.2, (0.4 + 0.05) * 0.5, 0);
+    createBox(baseHand, 0.1, 0.5, 0.1, -0.2, (0.4 + 0.05) * 0.5, 0);
 
 
 
@@ -44,4 +46,38 @@ function createRoboticArm(base) {
     }
 
     return mainJoint;
+}
+
+
+function rotateMain(axis, deg) {
+    deg /= 180 / Math.PI;
+    switch (axis) {
+        case "x":
+            mainJoint.rotation.x += deg;
+            break;
+        case "y":
+            mainJoint.rotation.y += deg;
+            break;
+        case "z":
+            mainJoint.rotation.z += deg;
+            break;
+
+    }
+}
+
+
+function rotateSec(axis, deg) {
+    deg /= 180 / Math.PI;
+    switch (axis) {
+        case "x":
+            secJoint.rotation.x += deg;
+            break;
+        case "y":
+            secJoint.rotation.y += deg;
+            break;
+        case "z":
+            secJoint.rotation.z += deg;
+            break;
+
+    }
 }
