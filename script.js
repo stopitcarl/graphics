@@ -1,23 +1,16 @@
 // CG project - JCoutinho 89470, JPorto 89472 and MNeves 89512
 
 // Three js objects
-let activeCam, cameraTop, cameraSide, cameraFront, scene, renderer, light;
-let camera, scene, renderer, light;
+let activeCam, cameraTop, cameraSide, cameraFront, cameraPerspective, scene, renderer, light;
 
 // Scene objects
 let car, floor, axesHelper;
 
 // Control flags
-let rotateMainZPos = false,
-    rotateMainZNeg = false,
-    rotateMainXPos = false,
-    rotateMainXNeg = false,
-    rotateSecZPos = false,
-    rotateSecZNeg = false,
-    rotateSecXPos = false,
-    rotateSecXNeg = false,
-    moveXPos = false,
-    moveXNeg = false;
+let rotateBase = 0,
+    rotateMainJoint = 0,
+    carMove = 0,
+    carTurn = 0;
 
 var step = 0,
     car_wireframe = false;
@@ -50,28 +43,36 @@ function init() {
     cameraFront.position.x = 30;
     cameraFront.position.y = 1;
     cameraFront.lookAt(scene.position);
+    // Perspective camera
+    cameraPerspective = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    cameraPerspective.position.x = -6;
+    cameraPerspective.position.y = 10;
+    cameraPerspective.position.z = 4;
+    cameraPerspective.lookAt(scene.position);
 
     activeCam = cameraTop;
 
     // lights
-    light = new THREE.DirectionalLight(0xffffff, 2, 100);
-    light.position.set(0, 7, 0);
-    light.castShadow = true;
+    // light = new THREE.PointLight(0xffffff, 1.5, 100);
+    light = new THREE.AmbientLight(0x404040); // soft white light
+    scene.add(light);
+    //light.position.set(0, 7, 0);
+    //light.castShadow = true;
     scene.add(light);
 
     //Set up shadow properties for the light
-    var d = 10;
-    light.castShadow = true;
-    light.shadow.camera.left = -d * 1.5;
-    light.shadow.camera.right = d * 1.5;
-    light.shadow.camera.top = d;
-    light.shadow.camera.bottom = -d;
+    // var d = 10;
+    // //light.castShadow = true;
+    // light.shadow.camera.left = -d * 1.5;
+    // light.shadow.camera.right = d * 1.5;
+    // light.shadow.camera.top = d;
+    // light.shadow.camera.bottom = -d;
 
-    light.shadow.camera.near = 0;
-    light.shadow.camera.far = light.position.y + 1;
+    // light.shadow.camera.near = 0;
+    // light.shadow.camera.far = light.position.y + 1;
 
-    light.shadow.mapSize.x = 2048;
-    light.shadow.mapSize.y = 2048;
+    // light.shadow.mapSize.x = 2048;
+    // light.shadow.mapSize.y = 2048;
 
 
 
@@ -84,8 +85,8 @@ function init() {
     scene.add(floor);
 
     //Create a helper for the shadow camera (optional)
-    var helper = new THREE.CameraHelper(light.shadow.camera);
-    scene.add(helper);
+    // var helper = new THREE.CameraHelper(light.shadow.camera);
+    // scene.add(helper);
 
     renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -122,69 +123,44 @@ function animate() {
 }
 
 function handleControls() {
-    // Main joint
-    if (rotateMainZPos)
-        rotateMain("z", 0.5);
-    if (rotateMainZNeg)
-        rotateMain("z", -0.5);
-    if (rotateMainXPos)
-        rotateMain("x", 0.5);
-    if (rotateMainXNeg)
-        rotateMain("x", -0.5);
 
-    // Secondary joint
-    if (rotateSecZPos)
-        rotateSec("z", 0.5);
-    if (rotateSecZNeg)
-        rotateSec("z", -0.5);
-    if (rotateSecXPos)
-        rotateSec("x", 0.5);
-    if (rotateSecXNeg)
-        rotateSec("x", -0.5);
+    // Rotate base
+    rotateBase(rotateBase);
 
-    // Car
-    if (moveXPos)
-        moveCar("x", 0.05);
-    if (moveXNeg)
-        moveCar("x", -0.05);
+    // Rotate first joint
+    rotateMain(rotateMainJoint);
 
+    // Car    
+    rotateCar(carTurn);
+    moveCar(carMove);
 }
 
 function onKeyDown(e) {
+
     switch (e.code) {
-        case "KeyW":
-            toggleWireframe(car, car_wireframe);
-            car_wireframe = !car_wireframe;
+        case "ArrowUp":
+            carMove = 1;
             break;
-        case "KeyF":
-            rotateMainZPos = true;
+        case "ArrowDown":
+            carMove = -1;
             break;
-        case "KeyG":
-            rotateMainZNeg = true;
+        case "ArrowLeft":
+            carTurn = -1;
             break;
-        case "KeyV":
-            rotateMainXPos = true;
-            break;
-        case "KeyB":
-            rotateMainXNeg = true;
-            break;
-        case "KeyH":
-            rotateSecZPos = true;
-            break;
-        case "KeyJ":
-            rotateSecZNeg = true;
-            break;
-        case "KeyN":
-            rotateSecXPos = true;
-            break;
-        case "KeyM":
-            rotateSecXNeg = true;
+        case "ArrowRight":
+        carTurn = 1;
             break;
         case "KeyA":
-            moveXNeg = true;
+            rotateBase = -1;
             break;
-        case "KeyD":
-            moveXPos = true;
+        case "KeyS":
+            rotateBase = 1;
+            break;
+        case "KeyQ":
+            rotateMainJoint = -1;
+            break;
+        case "KeyW":
+            rotateMainJoint = -1;
             break;
         case "Digit1":
             activeCam = cameraTop;
@@ -195,113 +171,53 @@ function onKeyDown(e) {
         case "Digit3":
             activeCam = cameraFront;
             break;
-        default:
+        case "Digit4":
+            toggleWireframe(car, car_wireframe);
+            car_wireframe = !car_wireframe;
             break;
-    }
-}
-            rotateMainZPos = true;
-            break;
-        case "KeyG":
-            rotateMainZNeg = true;
-            break;
-        case "KeyV":
-            rotateMainXPos = true;
-            break;
-        case "KeyB":
-            rotateMainXNeg = true;
-            break;
-        case "KeyH":
-            rotateSecZPos = true;
-            break;
-        case "KeyJ":
-            rotateSecZNeg = true;
-            break;
-        case "KeyN":
-            rotateSecXPos = true;
-            break;
-        case "KeyM":
-            rotateSecXNeg = true;
-            break;
-        case "KeyA":
-            moveXNeg = true;
-            break;
-        case "KeyD":
-            moveXPos = true;
-            break;
-
-function onKeyUp(e) {
-    switch (e.code) {
-
-        case "KeyF":
-            rotateMainZPos = false;
-            break;
-        case "KeyG":
-            rotateMainZNeg = false;
-            break;
-        case "KeyV":
-            rotateMainXPos = false;
-            break;
-        case "KeyB":
-            rotateMainXNeg = false;
-            break;
-        case "KeyH":
-            rotateSecZPos = false;
-            break;
-        case "KeyJ":
-            rotateSecZNeg = false;
-            break;
-        case "KeyN":
-            rotateSecXPos = false;
-            break;
-        case "KeyM":
-            rotateSecXNeg = false;
-            break;
-        case "KeyA":
-            moveXNeg = false;
-            break;
-        case "KeyD":
-            moveXPos = false;
+        case "Digit5":
+            activeCam = cameraPerspective;
             break;
     }
 }
 
+
 function onKeyUp(e) {
-    switch (e.code) {
+    // switch (e.code) {
 
-        case "KeyF":
-            rotateMainZPos = false;
-            break;
-        case "KeyG":
-            rotateMainZNeg = false;
-            break;
-        case "KeyV":
-            rotateMainXPos = false;
-            break;
-        case "KeyB":
-            rotateMainXNeg = false;
-            break;
-        case "KeyH":
-            rotateSecZPos = false;
-            break;
-        case "KeyJ":
-            rotateSecZNeg = false;
-            break;
-        case "KeyN":
-            rotateSecXPos = false;
-            break;
-        case "KeyM":
-            rotateSecXNeg = false;
-            break;
-        case "KeyA":
-            moveXNeg = false;
-            break;
-        case "KeyD":
-            moveXPos = false;
-            break;
-
-        default:
-            break;
-    }
+    //     case "KeyF":
+    //         rotateMainZPos = false;
+    //         break;
+    //     case "KeyG":
+    //         rotateMainZNeg = false;
+    //         break;
+    //     case "KeyV":
+    //         rotateMainXPos = false;
+    //         break;
+    //     case "KeyB":
+    //         rotateMainXNeg = false;
+    //         break;
+    //     case "KeyH":
+    //         rotateSecZPos = false;
+    //         break;
+    //     case "KeyJ":
+    //         rotateSecZNeg = false;
+    //         break;
+    //     case "KeyN":
+    //         rotateSecXPos = false;
+    //         break;
+    //     case "KeyM":
+    //         rotateSecXNeg = false;
+    //         break;
+    //     case "KeyA":
+    //         moveXNeg = false;
+    //         break;
+    //     case "KeyD":
+    //         moveXPos = false;
+    //         break;
+    //     default:
+    //         break;
+    // }
 }
 
 function onResize() {

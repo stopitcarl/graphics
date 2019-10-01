@@ -1,4 +1,4 @@
-let base;
+let base, armBase;
 let wheels = [];
 
 function createCar() {
@@ -18,7 +18,7 @@ function createCar() {
     createWheel(base, 3.5, -0.5, -1.5);
     createWheel(base, -3.5, -0.5, 1.5);
     createWheel(base, -3.5, -0.5, -1.5);
-    var armBase = createBase(base);
+    armBase = createBase(base);
     createRoboticArm(armBase);
 
     return base;
@@ -63,17 +63,23 @@ function toggleWireframe(obj, bool) {
         toggleWireframe(child, bool);
     });
 }
+function rotateCar(axis, vel) {
+    base.rotation.y += vel;
+    wheels.forEach(wheel => {
+        wheel.rotation.x -= 2 * vel;
+    })
+}
 
 function moveCar(axis, vel) {
-    switch (axis) {
-        case "x":
-            base.position.x += vel;
-            wheels.forEach(wheel => {
-                wheel.rotation.z -= 2*vel;
-            })
-            break;
-        case "z":
-            mainJoint.position.z += vel;
-            break;
-    }
+    base.position.x += vel;
+    wheels.forEach(wheel => {
+        wheel.rotation.z -= 2 * vel;
+    })
+
+}
+
+function rotateArmBase(deg) {
+    deg /= 180 / Math.PI;
+    armBase.rotation.y += deg;
+
 }
