@@ -26,24 +26,24 @@ function init() {
     // camera
     let viewSize = 20;
     let aspectRatio = window.innerWidth / window.innerHeight;
-    // Top camera
+    // Top camera (1)
     cameraTop = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
         viewSize / 2, viewSize / -2, -100, 100);
     cameraTop.position.y = 7;
     cameraTop.lookAt(scene.position);
-    // Side camera
+    // Side camera (2)
     cameraSide = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
         viewSize / 2, viewSize / -2, -100, 100);
-    cameraSide.position.z = -20;
-    cameraSide.position.y = 1;
+    cameraSide.position.z = 21;
+    cameraSide.position.y = 0;
     cameraSide.lookAt(scene.position);
-    // Front camera
+    // Front camera (3)
     cameraFront = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
         viewSize / 2, viewSize / -2, -100, 100);
-    cameraFront.position.x = 30;
-    cameraFront.position.y = 1;
+    cameraFront.position.x = 31;
+    cameraFront.position.y = 0;
     cameraFront.lookAt(scene.position);
-    // Perspective camera
+    // Perspective camera (5)
     cameraPerspective = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
     cameraPerspective.position.x = -6;
     cameraPerspective.position.y = 10;
@@ -52,13 +52,10 @@ function init() {
 
     activeCam = cameraTop;
 
-    // lights
-    // light = new THREE.PointLight(0xffffff, 1.5, 100);
-    light = new THREE.AmbientLight(0x404040); // soft white light
-    scene.add(light);
-    //light.position.set(0, 7, 0);
-    //light.castShadow = true;
-    scene.add(light);
+    // lights    
+    light = new THREE.AmbientLight(0x505050, 5); // soft white light
+    scene.add(light);    
+    
 
     //Set up shadow properties for the light
     // var d = 10;
@@ -79,10 +76,12 @@ function init() {
     axesHelper = new THREE.AxesHelper(2);
     axesHelper.position.set(-4, 4, -2);
     car = createCar();
+    target = createTarget();
     floor = createFloor();
     scene.add(axesHelper);
     scene.add(car);
     scene.add(floor);
+    car.add(cameraPerspective);
 
     //Create a helper for the shadow camera (optional)
     // var helper = new THREE.CameraHelper(light.shadow.camera);
@@ -125,14 +124,18 @@ function animate() {
 function handleControls() {
 
     // Rotate base
-    rotateBase(rotateBase);
+    if (rotateBase != 0)
+        rotateArmBase(rotateBase);
 
     // Rotate first joint
-    rotateMain(rotateMainJoint);
+    if (rotateMainJoint != 0)
+        rotateMain(rotateMainJoint);
 
     // Car    
-    rotateCar(carTurn);
-    moveCar(carMove);
+    if (carTurn != 0)
+        rotateCar(carTurn);
+    if (carMove != 0)
+        moveCar(carMove);
 }
 
 function onKeyDown(e) {
@@ -148,7 +151,7 @@ function onKeyDown(e) {
             carTurn = -1;
             break;
         case "ArrowRight":
-        carTurn = 1;
+            carTurn = 1;
             break;
         case "KeyA":
             rotateBase = -1;
@@ -157,7 +160,7 @@ function onKeyDown(e) {
             rotateBase = 1;
             break;
         case "KeyQ":
-            rotateMainJoint = -1;
+            rotateMainJoint = 1;
             break;
         case "KeyW":
             rotateMainJoint = -1;
@@ -178,46 +181,33 @@ function onKeyDown(e) {
         case "Digit5":
             activeCam = cameraPerspective;
             break;
+        default:
+            break;
     }
 }
 
 
 function onKeyUp(e) {
-    // switch (e.code) {
-
-    //     case "KeyF":
-    //         rotateMainZPos = false;
-    //         break;
-    //     case "KeyG":
-    //         rotateMainZNeg = false;
-    //         break;
-    //     case "KeyV":
-    //         rotateMainXPos = false;
-    //         break;
-    //     case "KeyB":
-    //         rotateMainXNeg = false;
-    //         break;
-    //     case "KeyH":
-    //         rotateSecZPos = false;
-    //         break;
-    //     case "KeyJ":
-    //         rotateSecZNeg = false;
-    //         break;
-    //     case "KeyN":
-    //         rotateSecXPos = false;
-    //         break;
-    //     case "KeyM":
-    //         rotateSecXNeg = false;
-    //         break;
-    //     case "KeyA":
-    //         moveXNeg = false;
-    //         break;
-    //     case "KeyD":
-    //         moveXPos = false;
-    //         break;
-    //     default:
-    //         break;
-    // }
+    switch (e.code) {
+        case "ArrowUp":
+        case "ArrowDown":
+            carMove = 0;
+            break;
+        case "ArrowLeft":
+        case "ArrowRight":
+            carTurn = 0;
+            break;
+        case "KeyA":
+        case "KeyS":
+            rotateBase = 0;
+            break;
+        case "KeyQ":
+        case "KeyW":
+            rotateMainJoint = 0;
+            break;
+        default:
+            break;
+    }
 }
 
 function onResize() {
