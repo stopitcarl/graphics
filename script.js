@@ -4,7 +4,7 @@
 let activeCam, cameraTop, cameraSide, cameraFront, cameraPerspective, scene, renderer, light;
 
 // Scene objects
-let car, floor, target, axesHelper;
+let car, floor, target;
 
 // Control flags
 let rotateBase = 0,
@@ -12,9 +12,8 @@ let rotateBase = 0,
     carMove = 0,
     carTurn = 0;
 
-var step = 0,
-    car_wireframe = false,
-    target_wireframe = false;
+var isWireframe = false;
+
 init();
 animate();
 
@@ -25,12 +24,12 @@ function init() {
     scene = new THREE.Scene();
 
     // camera
-    let viewSize = 20;
+    let viewSize = 15;
     let aspectRatio = window.innerWidth / window.innerHeight;
     // Top camera (1)
     cameraTop = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
         viewSize / 2, viewSize / -2, -100, 100);
-    cameraTop.position.y = 7;
+    cameraTop.position.y = 4;
     cameraTop.lookAt(scene.position);
     // Side camera (2)
     cameraSide = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
@@ -46,15 +45,14 @@ function init() {
     cameraFront.lookAt(scene.position);
     // Perspective camera (5)
     cameraPerspective = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-    cameraPerspective.position.x = -6;
-    cameraPerspective.position.y = 10;
-    cameraPerspective.position.z = 4;
-    cameraPerspective.lookAt(scene.position);
+    cameraPerspective.position.x = -8;
+    cameraPerspective.position.y = 8;
+    cameraPerspective.position.z = 2;
 
     activeCam = cameraTop;
 
     // lights
-    light = new THREE.AmbientLight(0x505050, 5); // soft white light
+    light = new THREE.AmbientLight(0x404040, 6); // soft white light
     scene.add(light);
 
 
@@ -72,28 +70,23 @@ function init() {
     // light.shadow.mapSize.x = 2048;
     // light.shadow.mapSize.y = 2048;
 
-
-
-    axesHelper = new THREE.AxesHelper(2);
-    axesHelper.position.set(-4, 4, -2);
+    
     car = createCar();
     target = createTarget();
-    floor = createFloor();
-    scene.add(axesHelper);
+    floor = createFloor();    
     scene.add(car);
     scene.add(floor);
     scene.add(target);
     car.add(cameraPerspective);
-
-    //Create a helper for the shadow camera (optional)
-    // var helper = new THREE.CameraHelper(light.shadow.camera);
-    // scene.add(helper);
+    let carTracker = base.position.clone();
+    carTracker.y += 1;
+    cameraPerspective.lookAt(carTracker);
 
     renderer = new THREE.WebGLRenderer({
         antialias: true,
     });
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+    // renderer.shadowMap.enabled = true;
+    // renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
@@ -104,18 +97,6 @@ function init() {
 
 function animate() {
     'use strict'
-
-    //car.position.x += 0.01;
-    //car.position.y += 0.01;
-    // light.position.x = Math.cos(step * 0.01) * (camera.position.x * 1.2)
-    // light.position.z = Math.sin(step * 0.01) * (camera.position.z * 1.2)
-    //  light.intensity = Math.sin(step*0.8) > 0 ? 2 : 0;
-    //camera.position.z = Math.cos(step) * (camera.position.z * 1.2);
-
-    //    camera.rotation.x = -6 * Math.cos(step);
-    //    camera.rotation.z = 6 * Math.cos(step);
-    step += 0.5;
-
 
     handleControls();
     requestAnimationFrame(animate);
@@ -156,10 +137,10 @@ function onKeyDown(e) {
             carTurn = 1;
             break;
         case "KeyA":
-            rotateBase = -1;
+            rotateBase = 1;
             break;
         case "KeyS":
-            rotateBase = 1;
+            rotateBase = -1;
             break;
         case "KeyQ":
             rotateMainJoint = 1;
@@ -177,10 +158,8 @@ function onKeyDown(e) {
             activeCam = cameraFront;
             break;
         case "Digit4":
-            toggleWireframe(car, car_wireframe);
-            car_wireframe = !car_wireframe;
-            toggleWireframe(target, target_wireframe);
-            target_wireframe = !target_wireframe;
+            toggleWireframe(isWireframe);
+            isWireframe = !isWireframe;
             break;
         case "Digit5":
             activeCam = cameraPerspective;
@@ -218,4 +197,21 @@ function onResize() {
     'use strict'
 
     renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function toggleWireframe(bool) {
+    scene.children.forEach(child => {
+        if (child.type === "Mesh")
+            toggleWireframeNode(bool, child);
+    });
+    floor.material.wireframe = false; // Comment this line to dislay floor wireframe
+}
+
+function toggleWireframeNode(bool, obj) {
+    if (obj.type != "Mesh")
+        return;
+    obj.material.wireframe = bool;
+    obj.children.forEach(child => {
+        toggleWireframeNode(bool, child);
+    });
 }

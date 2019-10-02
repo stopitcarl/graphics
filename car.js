@@ -1,8 +1,10 @@
 let base, armBase;
 let wheels = [];
 let VELOCITY = 0.1,
-    TURN_RATE = 2;
+    TURN_RATE = 2,
+    ARM_TURN_RATE = 3;
 let dir = 0;
+let carCenterOfMass;
 
 function createCar() {
     // 5x2.5 car with 0.5 radius wheels
@@ -22,7 +24,7 @@ function createCar() {
     createWheel(base, -2, -0.5, 0.75); // back right wheel
     createWheel(base, -2, -0.5, -0.75); // back left wheel
     armBase = createBase(base);
-    createRoboticArm(armBase);
+    carCenterOfMass = createRoboticArm(armBase).position;
 
     function createWheel(obj, x, y, z) {
         var geometry = new THREE.SphereBufferGeometry(0.5, 10, 10);
@@ -31,19 +33,19 @@ function createCar() {
             color: 0x3eb59b,
             wireframe: true
         });
-        var mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = x;
-        mesh.position.y = y;
-        mesh.position.z = z;
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
+        var wheel = new THREE.Mesh(geometry, material);
+        wheel.position.x = x;
+        wheel.position.y = y;
+        wheel.position.z = z;
+        wheel.castShadow = true;
+        wheel.receiveShadow = true;
 
-        obj.add(mesh)
-        wheels.push(mesh);
+        obj.add(wheel)
+        wheels.push(wheel);
     }
 
     function createBase(obj) {
-        var geometry = new THREE.SphereBufferGeometry(0.5, 15, 15, 0, Math.PI * 2, 0, Math.PI / 2);
+        var geometry = new THREE.SphereBufferGeometry(0.7, 15, 15, 0, Math.PI * 2, 0, Math.PI / 2);
         var material = new THREE.MeshLambertMaterial({
             flatShading: true,
             color: 0xe6af63,
@@ -60,14 +62,6 @@ function createCar() {
     return base;
 }
 
-
-
-function toggleWireframe(obj, bool) {
-    obj.material.wireframe = bool;
-    obj.children.forEach(child => {
-        toggleWireframe(child, bool);
-    });
-}
 
 function rotateCar(deg) {
     deg /= 180 / Math.PI;
@@ -88,6 +82,6 @@ function moveCar(vel) {
 }
 
 function rotateArmBase(deg) {
-    deg /= 180 / Math.PI;
-    armBase.rotation.y += deg;
+    deg /= 180 / Math.PI;    
+    armBase.rotation.y += deg * ARM_TURN_RATE;
 }
