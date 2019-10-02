@@ -4,33 +4,39 @@ function createTarget() {
     // ps: os eixos estao trocados no threejs, o coutinho sabe mas ninguem diga ao neves
     // deixem-no perceber qual é qual
 
-    // var cilinder-geometry = hhmmmmmm
-    // var torus-geometry = hhmmmmmm indeed
+    var cylinderGeometry = new THREE.CylinderBufferGeometry(0.5, 0.5, 3, 32);
+    var torusGeometry = new THREE.TorusBufferGeometry(0.3, 0.05, 20, 15);
 
-    // var material = hhhhhmmmm (but choose a cool color ye? maybe use different ones for torus (which means creating two materials) and cilinder
-    //                            the world is your oyster)
+    var cylinderMaterial = new THREE.MeshLambertMaterial({
+        color: 0x32a852,
+        wireframe: false
+    });
+    var torusMaterial = new THREE.MeshLambertMaterial({
+        color: 0x4287f5,
+        wireframe: false
+    });
 
-    // var cilinder = combine geometry and material
-    // var torus = combine geometry and material
-    
-    //  fistObject.add(secondObject); <--- choose which one is parent and which one is child
+    var cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+    var torus = new THREE.Mesh(torusGeometry, torusMaterial);
+
+    cylinder.add(torus);
 
     /*
     Some moving around and rotating happens here:
 
     note: if u move fistObject (whichever that is) up, it will start from origin (where car is)
-    but secondObject's starting point will be fistObject'center.    
+    but secondObject's starting point will be fistObject'center.
 
     u may need to rotate torus so it faces up.
     draw on paper first, hardcoding shit wont work cause brisson will know
     and we need paper for brisson, brisson likes paper, brisson was there when paper was invented
     he was the grandfather of the guy who invented paper
+*/
+    cylinder.position.x = 6;
+    cylinder.position.y = 1.5;
 
-    cilinder.rotation.someAxis = some useful number shit
-    object.position.x = some other useful shit
-    object.position.y = some other useful shit
-    object.position.z = some other useful shit
-    */
+    torus.position.y = 1.5 + 0.35;
+    torus.rotation.y = Math.PI / 2;
 
-    return null; // return the first object, whichever that is
-}
+
+    return cylinder;

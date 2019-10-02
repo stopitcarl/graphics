@@ -4,7 +4,7 @@
 let activeCam, cameraTop, cameraSide, cameraFront, cameraPerspective, scene, renderer, light;
 
 // Scene objects
-let car, floor, axesHelper;
+let car, floor, target, axesHelper;
 
 // Control flags
 let rotateBase = 0,
@@ -13,7 +13,8 @@ let rotateBase = 0,
     carTurn = 0;
 
 var step = 0,
-    car_wireframe = false;
+    car_wireframe = false,
+    target_wireframe = false;
 init();
 animate();
 
@@ -52,10 +53,10 @@ function init() {
 
     activeCam = cameraTop;
 
-    // lights    
+    // lights
     light = new THREE.AmbientLight(0x505050, 5); // soft white light
-    scene.add(light);    
-    
+    scene.add(light);
+
 
     //Set up shadow properties for the light
     // var d = 10;
@@ -81,6 +82,7 @@ function init() {
     scene.add(axesHelper);
     scene.add(car);
     scene.add(floor);
+    scene.add(target);
     car.add(cameraPerspective);
 
     //Create a helper for the shadow camera (optional)
@@ -131,7 +133,7 @@ function handleControls() {
     if (rotateMainJoint != 0)
         rotateMain(rotateMainJoint);
 
-    // Car    
+    // Car
     if (carTurn != 0)
         rotateCar(carTurn);
     if (carMove != 0)
@@ -177,6 +179,8 @@ function onKeyDown(e) {
         case "Digit4":
             toggleWireframe(car, car_wireframe);
             car_wireframe = !car_wireframe;
+            toggleWireframe(target, target_wireframe);
+            target_wireframe = !target_wireframe;
             break;
         case "Digit5":
             activeCam = cameraPerspective;
