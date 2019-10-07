@@ -70,10 +70,10 @@ function init() {
     // light.shadow.mapSize.x = 2048;
     // light.shadow.mapSize.y = 2048;
 
-    
+
     car = createCar();
     target = createTarget();
-    floor = createFloor();    
+    floor = createFloor();
     scene.add(car);
     scene.add(floor);
     scene.add(target);
@@ -98,10 +98,12 @@ function init() {
 function animate() {
     'use strict'
 
+    // Update
     handleControls();
-    requestAnimationFrame(animate);
+    // Render
     renderer.render(scene, activeCam);
-
+    // Setp up next render
+    requestAnimationFrame(animate);
 }
 
 function handleControls() {
@@ -112,7 +114,7 @@ function handleControls() {
 
     // Rotate first joint
     if (rotateMainJoint != 0)
-        rotateMain(rotateMainJoint);
+        rotateArmVertical(rotateMainJoint);
 
     // Car
     if (carTurn != 0)
@@ -195,6 +197,11 @@ function onKeyUp(e) {
 
 function onResize() {
     'use strict'
+
+    if (window.innerHeight > 0 && window.innerWidth > 0) {
+        activeCam.aspect = renderer.getSize().width / renderer.getSize().height;
+        cameraFront.updateProjectionMatrix();
+    }
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 }

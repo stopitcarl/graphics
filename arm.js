@@ -1,4 +1,5 @@
 let mainJoint, secJoint;
+let MAX_ROTATION = 1.448623279155295;
 
 function createRoboticArm(base) {
     var materialLight = new THREE.MeshLambertMaterial({
@@ -66,7 +67,16 @@ function createRoboticArm(base) {
 }
 
 
-function rotateMain(deg) {
+function rotateArmBase(deg) {
+    deg /= 180 / Math.PI;
+    armBase.rotation.y += deg * ARM_TURN_RATE;
+}
+
+function rotateArmVertical(deg) {
     deg /= 180 / Math.PI;
     mainJoint.rotation.z += deg;
+    if (mainJoint.rotation.z > MAX_ROTATION)
+        mainJoint.rotation.z = MAX_ROTATION;
+    else if (mainJoint.rotation.z < -MAX_ROTATION)
+        mainJoint.rotation.z = -MAX_ROTATION;
 }
