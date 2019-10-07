@@ -116,7 +116,7 @@ function handleControls() {
     if (rotateMainJoint != 0)
         rotateArmVertical(rotateMainJoint);
 
-    // Car
+    // Car movement
     if (carTurn != 0)
         rotateCar(carTurn);
     if (carMove != 0)
@@ -175,19 +175,39 @@ function onKeyDown(e) {
 function onKeyUp(e) {
     switch (e.code) {
         case "ArrowUp":
+            if (carMove < 0)
+                break;
+            carMove = 0;
         case "ArrowDown":
+            if (carMove > 0)
+                break;
             carMove = 0;
             break;
         case "ArrowLeft":
+            if (carTurn > 0)
+                break;
+            carTurn = 0;
         case "ArrowRight":
+            if (carTurn < 0)
+                break;
             carTurn = 0;
             break;
         case "KeyA":
+            if (rotateBase < 0)
+                break;
+            rotateBase = 0;
         case "KeyS":
+            if (rotateBase > 0)
+                break;
             rotateBase = 0;
             break;
         case "KeyQ":
+            if (rotateMainJoint < 0)
+                break;
+            rotateMainJoint = 0;
         case "KeyW":
+            if (rotateMainJoint > 0)
+                break;
             rotateMainJoint = 0;
             break;
         default:

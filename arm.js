@@ -1,5 +1,5 @@
 let mainJoint, secJoint;
-let MAX_ROTATION = 1.448623279155295;
+let MAX_ROTATION = 1.448623279155295; // ~85 degrees
 
 function createRoboticArm(base) {
     var materialLight = new THREE.MeshLambertMaterial({
@@ -24,7 +24,6 @@ function createRoboticArm(base) {
     mainJoint = createJoint(base, 0.01, 0);
     var primaryArm = createArm(mainJoint, 0.2, 3);
     secJoint = createJoint(primaryArm, 0.3, 3);
-    secJoint.rotation.z = -Math.PI / 2;
     var secArm = createArm(secJoint, 0.1, 2);
     var endJoint = createJoint(secArm, 0.05, 2);
     var baseHand = createBox(endJoint, 0.7, 0.05, 0.4, 0, 0, 0);
@@ -33,7 +32,7 @@ function createRoboticArm(base) {
 
     mainJoint.castShadow = true;
 
-
+    secJoint.rotation.z = -Math.PI / 2;
 
     // Helper functions
     function createArm(obj, width, length) {
