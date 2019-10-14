@@ -4,7 +4,7 @@
 let activeCam, cameraTop, cameraSide, cameraFront, cameraPerspective, scene, renderer, light;
 
 // Scene objects
-let cannon, floor, target;
+let car, floor, target;
 
 // Control flags
 let rotateBase = 0,
@@ -69,19 +69,15 @@ function init() {
 
     // light.shadow.mapSize.x = 2048;
     // light.shadow.mapSize.y = 2048;
-    
-    var axesHelper = new THREE.AxesHelper(2);
-    axesHelper.position.x = -1;
-    axesHelper.position.y = 1;
-    axesHelper.position.z = -3;
-    scene.add(axesHelper);
-    cannon = new Cannon();
+
+
+    car = createCar();
     target = createTarget();
-    floor = new Floor();
-    scene.add(cannon);
+    floor = createFloor();
+    scene.add(car);
     scene.add(floor);
     scene.add(target);
-    cannon.add(cameraPerspective);
+    car.add(cameraPerspective);
     let carTracker = base.position.clone();
     carTracker.y += 1;
     cameraPerspective.lookAt(carTracker);

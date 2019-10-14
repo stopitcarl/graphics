@@ -5,32 +5,28 @@ let VELOCITY = 0.1,
     ARM_TURN_RATE = 3;
 let dir = 0;
 
-class Cannon extends THREE.Mesh {
-    constructor(height, width) {
-        // 5x2.5 car with 0.5 radius wheels
-        let geometry = new THREE.BoxBufferGeometry(5, 0.2, 2.5);
-        let material = new THREE.MeshLambertMaterial({
-            //        flatShading: true,
-            color: 0x4083c7,
-            wireframe: true
-        });
-        super(geometry, material);
-        this.position.y = 1 + 0.1;
-        // base.castShadow = true;
-        // base.receiveShadow = true;
+function createCar() {
+    // 5x2.5 car with 0.5 radius wheels
+    var geometry = new THREE.BoxBufferGeometry(5, 0.2, 2.5);
+    var material = new THREE.MeshLambertMaterial({
+        //        flatShading: true,
+        color: 0x4083c7,
+        wireframe: true
+    });
+    base = new THREE.Mesh(geometry, material);
+    base.position.y = 1 + 0.1;
+    // base.castShadow = true;
+    // base.receiveShadow = true;
 
-        this.createWheel(this, 2, -0.6, 0.75); //  front right wheel
-        this.createWheel(this, 2, -0.6, -0.75); // front left wheel 
-        this.createWheel(this, -2, -0.6, 0.75); // back right wheel
-        this.createWheel(this, -2, -0.6, -0.75); // back left wheel
-        armBase = this.createBase(this);
-        createRoboticArm(armBase);
+    createWheel(base, 2, -0.6, 0.75); //  front right wheel
+    createWheel(base, 2, -0.6, -0.75); // front left wheel 
+    createWheel(base, -2, -0.6, 0.75); // back right wheel
+    createWheel(base, -2, -0.6, -0.75); // back left wheel
+    armBase = createBase(base);
+    createRoboticArm(armBase);
 
-        base = this;
-    }
-
-    createWheel(obj, x, y, z) {
-        let geometry = new THREE.SphereBufferGeometry(0.5, 10, 10);
+    function createWheel(obj, x, y, z) {
+        var geometry = new THREE.SphereBufferGeometry(0.5, 10, 10);
         let material = new THREE.MeshLambertMaterial({
             flatShading: true,
             color: 0x3eb59b,
@@ -48,7 +44,7 @@ class Cannon extends THREE.Mesh {
         wheels.push(wheelAxis);
     }
 
-    createBase(obj) {
+    function createBase(obj) {
         var geometry = new THREE.SphereBufferGeometry(0.7, 15, 15, 0, Math.PI * 2, 0, Math.PI / 2);
         var material = new THREE.MeshLambertMaterial({
             flatShading: true,
@@ -63,7 +59,10 @@ class Cannon extends THREE.Mesh {
         obj.add(base);
         return base;
     }
+
+    return base;
 }
+
 
 function rotateCar(deg) {
     deg /= 180 / Math.PI;
