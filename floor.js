@@ -23,9 +23,9 @@ class Floor extends THREE.Mesh {
         // floor.rotation.x = -Math.PI / 2;
 
         this.walls = [];
-        this.walls.push(new Wall(FLOOR_LONG, FLOOR_WIDTH/2, 0));
-        this.walls.push(new Wall(FLOOR_LONG, -FLOOR_WIDTH/2, 0));
+        this.walls.push(new Wall(FLOOR_LONG, FLOOR_WIDTH/2, 0));       
         this.walls.push(new Wall(FLOOR_WIDTH, 0, FLOOR_LONG/2));
+        this.walls.push(new Wall(FLOOR_WIDTH, 0, -FLOOR_LONG/2));
 
         this.walls.forEach(element => {
             this.add(element);
@@ -42,7 +42,7 @@ class Wall extends THREE.Mesh {
         let geometry = new THREE.BoxBufferGeometry(width, WALL_HEIGHT, WALL_THICK);
         let material = new THREE.MeshLambertMaterial({
             flatShading: true,
-            color: 0x555555,
+            color: 0xa5105f,
             // wireframe: true
         });
         super(geometry, material);
