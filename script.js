@@ -4,7 +4,7 @@
 let activeCam, cameraTop, cameraSide, cameraFront, cameraPerspective, scene, renderer, light;
 
 // Scene objects
-let cannon, floor, target;
+let cannon, floor, balls = [];
 
 // Control flags
 let rotateBase = 0,
@@ -12,7 +12,9 @@ let rotateBase = 0,
     carMove = 0,
     carTurn = 0;
 
-var isWireframe = false;
+var isWireframe = false,
+    clock;
+
 
 init();
 animate();
@@ -69,19 +71,28 @@ function init() {
 
     // light.shadow.mapSize.x = 2048;
     // light.shadow.mapSize.y = 2048;
-    
+
     var axesHelper = new THREE.AxesHelper(2);
     axesHelper.position.x = -1;
     axesHelper.position.y = 1;
     axesHelper.position.z = -3;
     scene.add(axesHelper);
     cannon = new Cannon();
-    target = createTarget();
     floor = new Floor();
     scene.add(cannon);
     scene.add(floor);
-    scene.add(target);
+
+    balls.push(new Ball(5, 0, -1, 0, 0, 0));
+    balls.push(new Ball(1, 0, 0, 0, 0, 6));
+
+    balls.forEach(bal => {
+        scene.add(bal);
+    });
+
+
+
     cannon.add(cameraPerspective);
+
     let carTracker = base.position.clone();
     carTracker.y += 1;
     cameraPerspective.lookAt(carTracker);
@@ -89,8 +100,9 @@ function init() {
     renderer = new THREE.WebGLRenderer({
         antialias: true,
     });
-    // renderer.shadowMap.enabled = true;
-    // renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+    clock = new THREE.Clock(true);
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
@@ -103,30 +115,42 @@ function animate() {
     'use strict'
 
     // Update
-    handleControls();
+    update();
     // Render
     renderer.render(scene, activeCam);
     // Setp up next render
     requestAnimationFrame(animate);
 }
 
-function handleControls() {
+function update() {
+
+
+
+    let delta = clock.getDelta();
+
+    insertionSort(balls);
+    balls.forEach(ball => {
+        ball.updatePhysics(delta);
+    });
+
+    // Collisions
+    for (let a = 0; a < balls.length; a++)
+        for (let b = a + 1; b < balls.length; b++)
+            balls[a].checkCollision(balls[b]);
 
     // Rotate base
-    if (rotateBase != 0)
-        rotateArmBase(rotateBase);
+    // balls.forEach(ball => {
+    //     ball.checkCollision();
+    // });
 
-    // Rotate first joint
-    if (rotateMainJoint != 0)
-        rotateArmVertical(rotateMainJoint);
-
-    // Car movement
-    if (carTurn != 0)
+    if (rotateCar)
         rotateCar(carTurn);
-    if (carMove != 0)
+    if (carMove)
         moveCar(carMove);
-}
 
+
+}
+var speed = 2;
 function onKeyDown(e) {
 
     switch (e.code) {
@@ -142,6 +166,10 @@ function onKeyDown(e) {
         case "ArrowRight":
             carTurn = 1;
             break;
+        case "KeyX":
+            var ball = new Ball(0, 0, 0, speed, 0, speed++);
+            balls.push(ball);
+            scene.add(ball);
         case "KeyA":
             rotateBase = 1;
             break;
