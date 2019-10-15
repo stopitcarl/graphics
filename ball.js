@@ -1,14 +1,15 @@
 // Constants
 let BALL_RADIUS = 0.5;
-let BALL_DRAG = 0.01;
-let RESTITUTION = 0.8;
+let BALL_DIAM = BALL_RADIUS + BALL_RADIUS;
+let BALL_DRAG = 0;
+let RESTITUTION = 1;
 let epsilon = 0.01;
 
 
 class Ball extends THREE.Mesh {
     constructor(x, y, z, velX, velY, velZ) {
         // 5x2.5 car with 0.5 radius wheels
-        let geometry = new THREE.SphereBufferGeometry(BALL_RADIUS, 10, 10);
+        let geometry = new THREE.SphereBufferGeometry(BALL_RADIUS, 5, 5);
         let material = new THREE.MeshLambertMaterial({
             //        flatShading: true,
             color: 0x4083c7,
@@ -21,64 +22,44 @@ class Ball extends THREE.Mesh {
         this.radius = BALL_RADIUS;
         this.mass = 1;
     }
-    checkCollision(ball) {
-        // get the mtd
-        let myPos = this.position.clone();
+    checkCollision2(ball) {
+        // If balls are touching
+        let dist = this.position.clone().sub(ball.position);
+        let dist2 = dist.clone();
+        let l = dist.length();
+        if (l > BALL_DIAM) return; // Balls aren't colliding
+        console.log("hit");
 
-        let delta = (myPos.sub(ball.position));
-        let r = this.radius + ball.radius;
-        let dist2 = delta.dot(delta);
+        // Move them to where they're not touching
+        dist.normalize();
+        this.position.sub(dist.clone().multiplyScalar((l - BALL_DIAM) / 2));
+        ball.position.add(dist.clone().multiplyScalar((l - BALL_DIAM) / 2));
 
-        if (dist2 > r * r) return; // they aren't colliding
+        // Give respective velocities
+        let m1 = this.mass;
+        let m2 = ball.mass;
+        let v = this.velocity.clone().sub(ball.velocity);
+        let vn = v.clone().dot(dist);
 
-        debugger;
-        let d = delta.length();
+        if (vn > 0) return;
 
-        let mtd = new THREE.Vector3();
-        if (d != 0.0) {
-            mtd = delta.multiplyScalar(((this.radius + ball.radius) - d) / d); // minimum translation distance to push balls apart after intersecting
+        let i = (-2 * vn) / (1 / m1 + 1 / m2);
+        let impulse = dist2.clone().multiplyScalar(i);
 
-        } else // Special case. Balls are exactly on top of eachother.  Don't want to divide by zero.
-        {
-            console.log("nope");
-            d = ball.radius + this.radius - 1.0;
-            delta = new THREE.Vector3(ball.radius + this.radius, 0, 0);
-
-            mtd = delta.multiplyScalar(((this.radius + ball.radius) - d) / d);
-        }
-
-        // resolve intersection
-        let im1 = 1 / this.mass; // inverse mass quantities
-        let im2 = 1 / ball.mass;
-
-        // push-pull them apart
-        let mtd1 = mtd.clone();
-        let mtd2 = mtd.clone();
-        let mtd3 = mtd.clone();
-        let mtd4 = mtd.clone();
-        this.position.add(mtd1.multiplyScalar(im1 / (im1 + im2)));
-        ball.position.sub(mtd2.multiplyScalar(im2 / (im1 + im2)));
-
-        // impact speed
-        let v = this.velocity.sub(ball.velocity);
-        let vn = v.dot(mtd3.normalize());
-
-        // sphere intersecting but moving away from each other already
-        if (vn > 0.0) return;
-
-        // collision impulse
-        let i = (-(1.0 + RESTITUTION) * vn) / (im1 + im2);
-        let impulse = mtd4.multiplyScalar(i);
-
-        // change in momentum
-        this.velocity = this.velocity.add(impulse.multiplyScalar(im1));
-        ball.velocity = ball.velocity.sub(impulse.multiplyScalar(im2));
+        this.velocity.add(impulse.clone().multiplyScalar(1 / m1));
+        ball.velocity.sub(impulse.clone().multiplyScalar(1 / m2));
     }
 
     updatePhysics(delta) {
 
         // Update position        
         this.position.addScaledVector(this.velocity, delta);
+        let v = new THREE.Vector3(0, 0, 1);
+        
+        // this.rotation.x += this.velocity.z * 2;
+        
+        // this.rotation.y = this.velocity.y * 2;
+        this.rotation.z += this.velocity.x * 2;
         // Update velocity
         this.velocity.addScaledVector(this.velocity, -BALL_DRAG);
         // Apply epsilon

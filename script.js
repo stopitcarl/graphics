@@ -13,7 +13,7 @@ let rotateBase = 0,
     carTurn = 0;
 
 var isWireframe = false,
-    clock;
+    clock, wallWorld;
 
 
 init();
@@ -82,8 +82,9 @@ function init() {
     scene.add(cannon);
     scene.add(floor);
 
-    balls.push(new Ball(5, 0, -1, 0, 0, 0));
-    balls.push(new Ball(1, 0, 0, 0, 0, 6));
+    // balls.push(new Ball(5, 0, 2, 0, 0, 0));
+    balls.push(new Ball(1.5, 0, 1, 0, 0, 3));
+    balls.push(new Ball(1, 0, -2, 0, 0, -3));
 
     balls.forEach(bal => {
         scene.add(bal);
@@ -105,6 +106,8 @@ function init() {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+
+    wallWorld = floor.getBoundingBox();
 
     window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKeyDown);
@@ -128,15 +131,16 @@ function update() {
 
     let delta = clock.getDelta();
 
-    insertionSort(balls);
+    // insertionSort(balls);
     balls.forEach(ball => {
         ball.updatePhysics(delta);
+        wallCollision(ball, wallWorld);
     });
 
     // Collisions
     for (let a = 0; a < balls.length; a++)
         for (let b = a + 1; b < balls.length; b++)
-            balls[a].checkCollision(balls[b]);
+            balls[a].checkCollision2(balls[b]);
 
     // Rotate base
     // balls.forEach(ball => {
@@ -150,7 +154,8 @@ function update() {
 
 
 }
-var speed = 2;
+var speed = 10;
+
 function onKeyDown(e) {
 
     switch (e.code) {
@@ -167,7 +172,7 @@ function onKeyDown(e) {
             carTurn = 1;
             break;
         case "KeyX":
-            var ball = new Ball(0, 0, 0, speed, 0, speed++);
+            var ball = new Ball(0, 0, 0, speed + ((Math.random() - 0.5) * speed), 0, speed + ((Math.random() - 0.5) * speed));
             balls.push(ball);
             scene.add(ball);
         case "KeyA":
