@@ -1,15 +1,17 @@
 // Constants
 let BALL_RADIUS = 0.5;
 let BALL_DIAM = BALL_RADIUS + BALL_RADIUS;
-let BALL_DRAG = 0;
+let BALL_DRAG = 0.01;
 let RESTITUTION = 1;
-let epsilon = 0.01;
+let epsilon = 0.05;
+var xAxis = new THREE.Vector3(1, 0, 0);
+var zAxis = new THREE.Vector3(0, 0, 1);
 
 
 class Ball extends THREE.Mesh {
     constructor(x, y, z, velX, velY, velZ) {
         // 5x2.5 car with 0.5 radius wheels
-        let geometry = new THREE.SphereBufferGeometry(BALL_RADIUS, 5, 5);
+        let geometry = new THREE.SphereBufferGeometry(BALL_RADIUS, 8, 8);
         let material = new THREE.MeshLambertMaterial({
             //        flatShading: true,
             color: 0x4083c7,
@@ -21,8 +23,10 @@ class Ball extends THREE.Mesh {
         this.velocity = new THREE.Vector3(velX, velY, velZ);
         this.radius = BALL_RADIUS;
         this.mass = 1;
+        var axesHelper = new THREE.AxesHelper(1);
+        this.add(axesHelper);
     }
-    checkCollision2(ball) {
+    checkCollision(ball) {
         // If balls are touching
         let dist = this.position.clone().sub(ball.position);
         let dist2 = dist.clone();
@@ -52,19 +56,21 @@ class Ball extends THREE.Mesh {
 
     updatePhysics(delta) {
 
+        // Update rotation                
+        this.rotateOnWorldAxis(zAxis, -this.velocity.x * delta * 2);
+        this.rotateOnWorldAxis(xAxis, this.velocity.z * delta * 2);
+
         // Update position        
         this.position.addScaledVector(this.velocity, delta);
         let v = new THREE.Vector3(0, 0, 1);
-        
-        // this.rotation.x += this.velocity.z * 2;
-        
-        // this.rotation.y = this.velocity.y * 2;
-        this.rotation.z += this.velocity.x * 2;
+
         // Update velocity
+        // Create drag vector
+        // let drag = this.velocity.clone().negate().normalize().multiplyScalar
         this.velocity.addScaledVector(this.velocity, -BALL_DRAG);
         // Apply epsilon
-        // if (this.velocity.length < epsilon)
-        //     this.velocity.set(0, 0, 0);
+        if (this.velocity.length() < epsilon)
+            this.velocity.set(0, 0, 0);
     }
 
     compareTo(ball) {

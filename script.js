@@ -47,9 +47,7 @@ function init() {
     cameraFront.lookAt(scene.position);
     // Perspective camera (5)
     cameraPerspective = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-    cameraPerspective.position.x = -8;
-    cameraPerspective.position.y = 8;
-    cameraPerspective.position.z = 2;
+    cameraPerspective.position.set(-28, 12, 11);
 
     activeCam = cameraTop;
 
@@ -83,8 +81,8 @@ function init() {
     scene.add(floor);
 
     // balls.push(new Ball(5, 0, 2, 0, 0, 0));
-    balls.push(new Ball(1.5, 0, 1, 0, 0, 3));
-    balls.push(new Ball(1, 0, -2, 0, 0, -3));
+    balls.push(new Ball(1.5, 0, 5, 0, 0, -1));
+    balls.push(new Ball(1, 0, -3, 0, 0, 1));
 
     balls.forEach(bal => {
         scene.add(bal);
@@ -92,7 +90,7 @@ function init() {
 
 
 
-    cannon.add(cameraPerspective);
+    // cannon.add(cameraPerspective);
 
     let carTracker = base.position.clone();
     carTracker.y += 1;
@@ -140,7 +138,7 @@ function update() {
     // Collisions
     for (let a = 0; a < balls.length; a++)
         for (let b = a + 1; b < balls.length; b++)
-            balls[a].checkCollision2(balls[b]);
+            balls[a].checkCollision(balls[b]);
 
     // Rotate base
     // balls.forEach(ball => {
@@ -161,14 +159,18 @@ function onKeyDown(e) {
     switch (e.code) {
         case "ArrowUp":
             carMove = 1;
+            cameraPerspective.position.x += 1;
             break;
         case "ArrowDown":
+            cameraPerspective.position.x -= 1;
             carMove = -1;
             break;
         case "ArrowLeft":
+            cameraPerspective.position.z -= 1;
             carTurn = -1;
             break;
         case "ArrowRight":
+            cameraPerspective.position.z += 1;
             carTurn = 1;
             break;
         case "KeyX":

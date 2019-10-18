@@ -7,25 +7,50 @@ let dir = 0;
 
 class Cannon extends THREE.Mesh {
     constructor(height, width) {
-        // 5x2.5 car with 0.5 radius wheels
-        let geometry = new THREE.BoxBufferGeometry(5, 0.2, 2.5);
+
+        var outerRadius = 1.2;
+        var innerRadius = 1;
+        var height = 5;
         let material = new THREE.MeshLambertMaterial({
             //        flatShading: true,
             color: 0x4083c7,
             wireframe: true
         });
+
+        var arcShape = new THREE.Shape();
+        arcShape.moveTo(outerRadius * 2, outerRadius);
+        arcShape.absarc(outerRadius, outerRadius, outerRadius, 0, Math.PI * 2, false);
+        var holePath = new THREE.Path();
+        holePath.moveTo(outerRadius + innerRadius, outerRadius);
+        holePath.absarc(outerRadius, outerRadius, innerRadius, 0, Math.PI * 2, true);
+        arcShape.holes.push(holePath);
+
+        var geometry = new THREE.ExtrudeGeometry(arcShape, {
+            amount: height,
+            bevelEnabled: false,
+            steps: 1,
+            curveSegments: 20
+        });
+        geometry.center();
+        geometry.rotateX(Math.PI * -.5);
+        // var mesh = new THREE.Mesh(geometry, material);
+
+
+
+        // 5x2.5 car with 0.5 radius wheels
+        let geometrybox = new THREE.BoxBufferGeometry(5, 0.2, 2.5);
         super(geometry, material);
-        this.position.y = 1 + 0.1;
+        this.rotation.z = Math.PI / 2;
+        this.position.y = outerRadius >> 1;
         // base.castShadow = true;
         // base.receiveShadow = true;
 
-        this.createWheel(this, 2, -0.6, 0.75); //  front right wheel
-        this.createWheel(this, 2, -0.6, -0.75); // front left wheel 
-        this.createWheel(this, -2, -0.6, 0.75); // back right wheel
-        this.createWheel(this, -2, -0.6, -0.75); // back left wheel
-        armBase = this.createBase(this);
-        createRoboticArm(armBase);
-
+        // this.createWheel(this, 2, -0.6, 0.75); //  front right wheel
+        // this.createWheel(this, 2, -0.6, -0.75); // front left wheel 
+        // this.createWheel(this, -2, -0.6, 0.75); // back right wheel
+        // this.createWheel(this, -2, -0.6, -0.75); // back left wheel
+        // armBase = this.createBase(this);
+        // createRoboticArm(armBase);
         base = this;
     }
 
@@ -70,7 +95,8 @@ function rotateCar(deg) {
     dir += deg * TURN_RATE;
     base.rotation.y = -dir;
     for (let i = 0; i < 4; i++)
-        wheels[i].children[0].rotation.x -= (i < 2 ? -1 : 1) * 4 * deg;
+        // wheels[i].children[0].rotation.x -= (i < 2 ? -1 : 1) * 4 * deg;
+        break;
 
 }
 
