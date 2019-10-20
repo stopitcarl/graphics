@@ -3,7 +3,7 @@ function createFloor() {
 
     // let screenRatio = window.innerHeight / window.innerWidth;
     var geometry = new THREE.BoxBufferGeometry(30, 0.1,18);
-    var material = new THREE.MeshLambertMaterial({
+    var material = new THREE.MeshBasicMaterial({
         flatShading: true,
         color: 0x555555,
         // wireframe: true

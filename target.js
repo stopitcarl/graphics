@@ -3,11 +3,11 @@ function createTarget() {
     var cylinderGeometry = new THREE.CylinderBufferGeometry(0.3, 0.3, 3, 15);
     var torusGeometry = new THREE.TorusBufferGeometry(0.35, 0.1, 8, 15);
 
-    var cylinderMaterial = new THREE.MeshLambertMaterial({
+    var cylinderMaterial = new THREE.MeshBasicMaterial({
         color: 0x8844aa,
         wireframe: true
     });
-    var torusMaterial = new THREE.MeshLambertMaterial({
+    var torusMaterial = new THREE.MeshBasicMaterial({
         color: 0x4287f5,
         wireframe: true
     });

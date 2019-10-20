@@ -2,19 +2,19 @@ let mainJoint, secJoint;
 let MAX_ROTATION = 1.448623279155295; // ~85 degrees
 
 function createRoboticArm(base) {
-    var materialLight = new THREE.MeshLambertMaterial({
+    var materialLight = new THREE.MeshBasicMaterial({
         color: 0x6e653b,
         wireframe: true
     });
-    var materialDark = new THREE.MeshLambertMaterial({
+    var materialDark = new THREE.MeshBasicMaterial({
         color: 0xe6af63,
         wireframe: true
     });
-    var materialDarkGrey = new THREE.MeshLambertMaterial({
+    var materialDarkGrey = new THREE.MeshBasicMaterial({
         color: 0x3d7a3c,
         wireframe: true
     });
-    var materialBlack = new THREE.MeshLambertMaterial({
+    var materialBlack = new THREE.MeshBasicMaterial({
         color: 0x9c9c9c,
         wireframe: true
     });

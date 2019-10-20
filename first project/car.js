@@ -8,7 +8,7 @@ let dir = 0;
 function createCar() {
     // 5x2.5 car with 0.5 radius wheels
     var geometry = new THREE.BoxBufferGeometry(5, 0.2, 2.5);
-    var material = new THREE.MeshLambertMaterial({
+    var material = new THREE.MeshBasicMaterial({
         //        flatShading: true,
         color: 0x4083c7,
         wireframe: true
@@ -27,7 +27,7 @@ function createCar() {
 
     function createWheel(obj, x, y, z) {
         var geometry = new THREE.SphereBufferGeometry(0.5, 10, 10);
-        let material = new THREE.MeshLambertMaterial({
+        let material = new THREE.MeshBasicMaterial({
             flatShading: true,
             color: 0x3eb59b,
             wireframe: true
@@ -46,7 +46,7 @@ function createCar() {
 
     function createBase(obj) {
         var geometry = new THREE.SphereBufferGeometry(0.7, 15, 15, 0, Math.PI * 2, 0, Math.PI / 2);
-        var material = new THREE.MeshLambertMaterial({
+        var material = new THREE.MeshBasicMaterial({
             flatShading: true,
             color: 0xe6af63,
             wireframe: true

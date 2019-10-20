@@ -1,10 +1,14 @@
 // CG project - JCoutinho 89470, JPorto 89472 and MNeves 89512
 
 // Three js objects
-let activeCam, cameraTop, cameraSide, cameraFront, cameraPerspective, scene, renderer, light;
+let cams = [],
+    activeCam, cameraTop, cameraSide, cameraFront, cameraPerspective, scene, renderer, light;
 
 // Scene objects
-let cannon, floor, balls = [];
+let floor,
+    balls = [],
+    cannons = [],
+    activeCannon;
 
 // Control flags
 let rotateBase = 0,
@@ -13,7 +17,16 @@ let rotateBase = 0,
     carTurn = 0;
 
 var isWireframe = false,
-    clock, wallWorld;
+    clock;
+
+let WINDOW_MIN_HEIGHT = 135,
+    WINDOW_MIN_WIDTH = 240;
+
+// camera shortcuts
+let TOP = 0,
+    SIDE = 1,
+    FRONT = 2,
+    PERSP = 3;
 
 
 init();
@@ -26,33 +39,37 @@ function init() {
     scene = new THREE.Scene();
 
     // camera
-    let viewSize = 15;
+    let viewSize = 30;
     let aspectRatio = window.innerWidth / window.innerHeight;
     // Top camera (1)
     cameraTop = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
         viewSize / 2, viewSize / -2, -100, 100);
     cameraTop.position.y = 4;
     cameraTop.lookAt(scene.position);
+    cams.push(cameraTop);
     // Side camera (2)
     cameraSide = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
-        viewSize / 2, viewSize / -2, -100, 100);
+        viewSize / 2, viewSize / -2, 0, 100);
     cameraSide.position.z = 21;
     cameraSide.position.y = 0;
     cameraSide.lookAt(scene.position);
+    cams.push(cameraSide);
     // Front camera (3)
     cameraFront = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
         viewSize / 2, viewSize / -2, -100, 100);
-    cameraFront.position.x = 31;
+    cameraFront.position.x = -31;
     cameraFront.position.y = 0;
     cameraFront.lookAt(scene.position);
+    cams.push(cameraFront);
     // Perspective camera (5)
     cameraPerspective = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
     cameraPerspective.position.set(-28, 12, 11);
+    cams.push(cameraPerspective);
 
-    activeCam = cameraTop;
+    activeCam = cams[PERSP];
 
     // lights
-    light = new THREE.AmbientLight(0x404040, 6); // soft white light
+    light = new THREE.AmbientLight(0x404040, 10); // soft white light
     scene.add(light);
 
 
@@ -75,26 +92,34 @@ function init() {
     axesHelper.position.y = 1;
     axesHelper.position.z = -3;
     scene.add(axesHelper);
-    cannon = new Cannon();
+    let cannon1 = new Cannon(false, -FLOOR_LONG, -3);
+    cannons.push(cannon1);
+    let cannon2 = new Cannon(true, -FLOOR_LONG, 0);
+    cannons.push(cannon2);
+    let cannon3 = new Cannon(false, -FLOOR_LONG, 3);
+    cannons.push(cannon3);
     floor = new Floor();
-    scene.add(cannon);
     scene.add(floor);
 
-    // balls.push(new Ball(5, 0, 2, 0, 0, 0));
-    balls.push(new Ball(1.5, 0, 5, 0, 0, -1));
-    balls.push(new Ball(1, 0, -3, 0, 0, 1));
+    activeCannon = cannons[1];
+
+
 
     balls.forEach(bal => {
         scene.add(bal);
+    });
+
+    cannons.forEach(can => {
+        scene.add(can);
     });
 
 
 
     // cannon.add(cameraPerspective);
 
-    let carTracker = base.position.clone();
-    carTracker.y += 1;
-    cameraPerspective.lookAt(carTracker);
+    let carTracker = floor.position.clone();
+    carTracker.x -= 6;
+    cams[PERSP].lookAt(carTracker);
 
     renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -105,11 +130,22 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    wallWorld = floor.getBoundingBox();
-
     window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+}
+
+function populateBalls(numOfBalls) {
+    var pos = new THREE.Vector3(0, 0, 0);
+    var vel = pos.clone();
+    for (var i = 0; i < numOfBalls; i++) {
+        pos.set(
+            (Math.random() * (FLOOR_LONG / 2)) - (FLOOR_LONG / 2),
+            0,
+            (Math.random() * (FLOOR_WIDTH / 2)) - (FLOOR_WIDTH / 2));
+        balls.push(new Ball(pos, vel));
+    }
+
 }
 
 function animate() {
@@ -125,14 +161,14 @@ function animate() {
 
 function update() {
 
-
-
+    // Get delta
     let delta = clock.getDelta();
 
     // insertionSort(balls);
     balls.forEach(ball => {
-        ball.updatePhysics(delta);
-        wallCollision(ball, wallWorld);
+        if (ball.updatePhysics(delta) < -10)
+            console.log("delete this ball");
+        wallCollision(ball);
     });
 
     // Collisions
@@ -140,18 +176,8 @@ function update() {
         for (let b = a + 1; b < balls.length; b++)
             balls[a].checkCollision(balls[b]);
 
-    // Rotate base
-    // balls.forEach(ball => {
-    //     ball.checkCollision();
-    // });
-
-    if (rotateCar)
-        rotateCar(carTurn);
-    if (carMove)
-        moveCar(carMove);
-
-
 }
+
 var speed = 10;
 
 function onKeyDown(e) {
@@ -174,7 +200,7 @@ function onKeyDown(e) {
             carTurn = 1;
             break;
         case "KeyX":
-            var ball = new Ball(0, 0, 0, speed + ((Math.random() - 0.5) * speed), 0, speed + ((Math.random() - 0.5) * speed));
+            var ball = activeCannon.shoot();
             balls.push(ball);
             scene.add(ball);
         case "KeyA":
@@ -184,10 +210,12 @@ function onKeyDown(e) {
             rotateBase = -1;
             break;
         case "KeyQ":
-            rotateMainJoint = 1;
+            activeCannon = cannons[0]; // TODO: select && deseelct cannon to change colors
             break;
         case "KeyW":
-            rotateMainJoint = -1;
+            activeCannon = cannons[1];
+        case "KeyE":
+            activeCannon = cannons[2];
             break;
         case "Digit1":
             activeCam = cameraTop;
@@ -240,15 +268,6 @@ function onKeyUp(e) {
                 break;
             rotateBase = 0;
             break;
-        case "KeyQ":
-            if (rotateMainJoint < 0)
-                break;
-            rotateMainJoint = 0;
-        case "KeyW":
-            if (rotateMainJoint > 0)
-                break;
-            rotateMainJoint = 0;
-            break;
         default:
             break;
     }
@@ -257,12 +276,16 @@ function onKeyUp(e) {
 function onResize() {
     'use strict'
 
-    if (window.innerHeight > 0 && window.innerWidth > 0) {
-        activeCam.aspect = renderer.getSize().width / renderer.getSize().height;
-        cameraFront.updateProjectionMatrix();
+    if (window.innerHeight > WINDOW_MIN_HEIGHT && window.innerWidth > WINDOW_MIN_WIDTH) {
+        cams.forEach(came => {
+            activeCam.aspect = window.innerWidth / window.innerHeight;
+            activeCam.updateProjectionMatrix();
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
     }
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function toggleWireframe(bool) {
