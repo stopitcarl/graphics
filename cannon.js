@@ -1,4 +1,4 @@
-let TURN_RATE = 20,
+let TURN_RATE = 50,
     SHOOT_SPEED = 15;
 
 
@@ -66,7 +66,13 @@ class Cannon extends THREE.Mesh {
     }
 
     shoot() {
-        var ball = new Ball(this.position,
+        let ballOffset = new THREE.Vector3(
+            SHOOT_SPEED * Math.cos(this.dir),
+            0,
+            SHOOT_SPEED * Math.sin(this.dir)
+        ).normalize().multiplyScalar(1.5);
+
+        var ball = new Ball(this.position.clone().sub(ballOffset),
             new THREE.Vector3(
                 SHOOT_SPEED * Math.cos(this.dir),
                 0,

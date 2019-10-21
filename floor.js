@@ -27,8 +27,8 @@ class Floor extends THREE.Mesh {
 
         this.walls = [];
         this.walls.push(new Wall(FLOOR_LONG, FLOOR_WIDTH / 2, 0));
-        this.walls.push(new Wall(FLOOR_WIDTH - EXTRA_FLOOR, 0, FLOOR_LONG / 2));
-        this.walls.push(new Wall(FLOOR_WIDTH - EXTRA_FLOOR, 0, -FLOOR_LONG / 2));
+        this.walls.push(new Wall(FLOOR_WIDTH, 0, FLOOR_LONG / 2));
+        this.walls.push(new Wall(FLOOR_WIDTH, 0, -FLOOR_LONG / 2));
 
         this.walls.forEach(wall => {
             this.add(wall);
@@ -65,9 +65,9 @@ class Wall extends THREE.Mesh {
 
         if (z == 0) {
             this.rotation.y = -Math.PI / 2
-        } else {
-            this.position.x += EXTRA_FLOOR / 2;
-        }
+        } //else {
+        //     this.position.x += EXTRA_FLOOR / 2;
+        // }
     }
 }
 

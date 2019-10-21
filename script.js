@@ -207,8 +207,7 @@ function updateBallCam() {
 }
 
 
-function onKeyDown(e) {
-    console.log(e.code);
+function onKeyDown(e) {    
     switch (e.code) {
         case "ArrowLeft":
             // cameraPerspective.position.z -= 1;
