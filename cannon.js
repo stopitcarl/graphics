@@ -1,14 +1,14 @@
-let TURN_RATE = 2,
-    SHOOT_SPEED = 7;
+let TURN_RATE = 20,
+    SHOOT_SPEED = 15;
 
 
 class Cannon extends THREE.Mesh {
     constructor(selected, x, z) {
         var outerRadius = 0.8;
         var innerRadius = 0.7;
-        var height = 5;
+        var height = 3;
         var deselectedMaterial = new THREE.MeshBasicMaterial({
-            color: 0x4083c7,
+            color: 0xfcba03,
             wireframe: true
         });
 
@@ -34,7 +34,7 @@ class Cannon extends THREE.Mesh {
         geometry.center();
         geometry.rotateX(Math.PI * -.5);
 
-        // 90IQ play
+        // Creates object
         super(geometry, selected ? selectedMaterial : deselectedMaterial);
 
         this.selectedMaterial = selectedMaterial;
@@ -42,10 +42,10 @@ class Cannon extends THREE.Mesh {
 
         // Set rotation
         this.rotation.z = Math.PI / 2;
-        this.position.y += innerRadius;
 
         // Set cannon to right position
         this.position.x = x;
+        this.position.y += innerRadius;
         this.position.z = z;
 
         this.dir = 0;
@@ -62,7 +62,7 @@ class Cannon extends THREE.Mesh {
     rotate(deg, delta) {
         deg /= 180 / Math.PI;
         this.dir += deg * TURN_RATE * delta;
-        this.rotation.y = -dir;
+        this.rotation.y = -this.dir;
     }
 
     shoot() {

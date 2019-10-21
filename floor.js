@@ -1,8 +1,9 @@
 /**
  * Creates floor and walls, returns floor mesh
  */
-var FLOOR_WIDTH = 30,
+var FLOOR_WIDTH = 40,
     FLOOR_LONG = 20,
+    EXTRA_FLOOR = 4,
     FLOOR_HEIGHT = 0.1,
     WALL_HEIGHT = 1,
     WALL_THICK = 0.2;
@@ -26,8 +27,8 @@ class Floor extends THREE.Mesh {
 
         this.walls = [];
         this.walls.push(new Wall(FLOOR_LONG, FLOOR_WIDTH / 2, 0));
-        this.walls.push(new Wall(FLOOR_WIDTH, 0, FLOOR_LONG / 2));
-        this.walls.push(new Wall(FLOOR_WIDTH, 0, -FLOOR_LONG / 2));
+        this.walls.push(new Wall(FLOOR_WIDTH - EXTRA_FLOOR, 0, FLOOR_LONG / 2));
+        this.walls.push(new Wall(FLOOR_WIDTH - EXTRA_FLOOR, 0, -FLOOR_LONG / 2));
 
         this.walls.forEach(wall => {
             this.add(wall);
@@ -64,6 +65,8 @@ class Wall extends THREE.Mesh {
 
         if (z == 0) {
             this.rotation.y = -Math.PI / 2
+        } else {
+            this.position.x += EXTRA_FLOOR / 2;
         }
     }
 }
@@ -73,9 +76,10 @@ function wallCollision(ball) {
     if ((ball.position.x + ball.radius) > boundingBox.max.x) {
         ball.position.x = boundingBox.max.x - ball.radius;
         ball.velocity.x = -ball.velocity.x;
-    } else if ((ball.position.x - ball.radius) < boundingBox.min.x) {
-        ball.position.x = boundingBox.min.x + ball.radius;
-        ball.velocity.x = -ball.velocity.x;
+    } else if ((ball.position.x + ball.radius) < boundingBox.min.x) {
+        ball.insideFloor = false;
+        // ball.position.x = boundingBox.min.x + ball.radius;
+        // ball.velocity.x = -ball.velocity.x;
     }
 
     if ((ball.position.z + ball.radius) > boundingBox.max.z) {
@@ -84,5 +88,10 @@ function wallCollision(ball) {
     } else if ((ball.position.z - ball.radius) < boundingBox.min.z) {
         ball.position.z = boundingBox.min.z + ball.radius;
         ball.velocity.z = -ball.velocity.z;
+    }
+
+    if (ball.insideFloor) {
+        ball.position.y = BALL_RADIUS;
+        ball.velocity.y = 0;
     }
 }
