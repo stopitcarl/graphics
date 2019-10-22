@@ -16,7 +16,7 @@ class Ball extends THREE.Mesh {
         let material = new THREE.MeshBasicMaterial({
             //        flatShading: true,
             color: 0x4083c7,
-            wireframe: true
+            wireframe: !isWireframe
         });
         super(geometry, material);
 
@@ -120,6 +120,6 @@ class Ball extends THREE.Mesh {
         // if (this.gravity)
         this.velocity.y -= GRAVITY * delta;
 
-        return this.position.y;
+        if (this.position.y < -10) this.position.y = -10;
     }
 }

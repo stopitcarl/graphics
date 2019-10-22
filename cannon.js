@@ -48,6 +48,7 @@ class Cannon extends THREE.Mesh {
         this.position.y += innerRadius;
         this.position.z = z;
 
+        this.length = 3;
         this.dir = 0;
     }
 
@@ -70,7 +71,7 @@ class Cannon extends THREE.Mesh {
             SHOOT_SPEED * Math.cos(this.dir),
             0,
             SHOOT_SPEED * Math.sin(this.dir)
-        ).normalize().multiplyScalar(1.5);
+        ).normalize().multiplyScalar(this.length / 2 - BALL_RADIUS);
 
         var ball = new Ball(this.position.clone().sub(ballOffset),
             new THREE.Vector3(

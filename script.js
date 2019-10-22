@@ -219,6 +219,7 @@ function onKeyDown(e) {
             break;
         case "Space":
             isShoot = true;
+            break;
         case "KeyA":
             rotateBase = 1;
             break;
