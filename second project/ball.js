@@ -111,7 +111,8 @@ class Ball extends THREE.Mesh {
         this.rotateOnWorldAxis(xAxis, this.velocity.z * delta / BALL_RADIUS);
 
         // Update velocity with drag
-        this.velocity.sub(this.velocity.clone().normalize().multiplyScalar(BALL_DRAG * delta));
+        let drag = this.velocity.clone().normalize().multiplyScalar(BALL_DRAG * delta);
+        this.velocity.sub(drag);
 
         // Apply epsilon
         if (this.velocity.length() < epsilon)

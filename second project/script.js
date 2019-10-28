@@ -2,7 +2,7 @@
 
 // Three js objects
 let cams = [],
-    activeCam, cameraTop, orbitingCam, cameraPerspective, scene, renderer, light;
+    activeCam, cameraTop, cameraBall, cameraPerspective, scene, renderer, light;
 
 // Scene objects
 let floor,
@@ -23,12 +23,16 @@ var isWireframe = false,
     clock,
     timeElapsed = 0;
 
-let CAM_ZOOM = 20;    
+let WINDOW_MIN_HEIGHT = 135,
+    WINDOW_MIN_WIDTH = 240;
 
 // camera shortcuts
 let TOP = 0,
     PERSP = 1,
-    THIRD = 2;
+    BALLCAM = 2;
+
+let BALLCAM_DISTANCE = BALL_DIAM * 4,
+    BALCAM_HEIGHT = BALL_DIAM * 2;
 
 
 init();
@@ -52,40 +56,82 @@ function init() {
     // Perspective camera (2)
     cameraPerspective = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
     cameraPerspective.position.set(-28, 12, 11);
-    cameraPerspective.lookAt(scene.position);
     cams.push(cameraPerspective);
     // Ball camera (3)
-    orbitingCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-    orbitingCam.position.set(-32, 12, 0);
-    orbitingCam.lookAt(scene.position);
-    cams.push(orbitingCam);
+    cameraBall = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    cameraBall.position.set(-28, 12, 11);
+    cameraBall.lookAt(scene.position);
+    cams.push(cameraBall);
 
-    activeCam = cams[PERSP];    
+    activeCam = cams[TOP];
 
-
-    // ######### Objects ############
-    floor = new Floor();
-    scene.add(floor);
-    wall = new Wall(floor.getWidthX(), floor.getWidthZ(), floor.getWidthX() / 2, 0);
-    scene.add(wall);
-    let isocad = new Isocaedrus();
-    scene.add(isocad);
-
-
-    // ######### Lights ############
+    // lights
     light = new THREE.AmbientLight(0x404040, 10); // soft white light
     scene.add(light);
 
-    
-    // ######### Renderer ############
+    // var axesHelper = new THREE.AxesHelper(2);
+    // axesHelper.position.x = -1;
+    // axesHelper.position.y = 1;
+    // axesHelper.position.z = -3;
+    // scene.add(axesHelper);
+    let cannon1 = new Cannon(false, -FLOOR_WIDTH / 2 + EXTRA_FLOOR, -6);
+    cannons.push(cannon1);
+    let cannon2 = new Cannon(true, -FLOOR_WIDTH / 2 + EXTRA_FLOOR, 0);
+    cannons.push(cannon2);
+    let cannon3 = new Cannon(false, -FLOOR_WIDTH / 2 + EXTRA_FLOOR, 6);
+    cannons.push(cannon3);
+    floor = new Floor();
+    scene.add(floor);
+
+    activeCannon = cannons[1];
+
+    // Create balls
+    populateBalls(10);
+    targetBall = balls[9];
+
+    balls.forEach(bal => {
+        scene.add(bal);
+    });
+
+    cannons.forEach(can => {
+        scene.add(can);
+    });
+
+
+
+
+    // cannon.add(cameraPerspective);
+
+    let perspTarget = floor.position.clone();
+    perspTarget.x -= 8;
+    cams[PERSP].lookAt(perspTarget);
+
+
     renderer = new THREE.WebGLRenderer({
         antialias: true,
     });
+
+    clock = new THREE.Clock(true);
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+
     window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+}
+
+function populateBalls(numOfBalls) {
+    var pos = new THREE.Vector3(0, 0, 0);
+    var vel = pos.clone();
+    for (var i = 0; i < numOfBalls; i++) {
+        pos.set(
+            (Math.random() * (FLOOR_WIDTH * 0.7)) - (FLOOR_WIDTH * 0.3),
+            0,
+            (Math.random() * (FLOOR_LONG * 0.8)) - (FLOOR_LONG / 2));
+        balls.push(new Ball(pos.clone(), vel.clone()));
+    }
+
 }
 
 function animate() {
@@ -99,9 +145,70 @@ function animate() {
 }
 
 function update() {
-    // TODO: Delete function and all calls to it    
-    
+
+
+    // Get delta
+    let delta = clock.getDelta();
+    timeElapsed += delta;
+
+    // <Handle controls>
+
+    // Shoot?
+    if (isShoot) {
+        var ball = activeCannon.shoot();
+        balls.push(ball);
+        scene.add(ball);
+        isShoot = false;
+    }
+
+    // Turn?
+    if (cannonTurn != 0) {
+        activeCannon.rotate(cannonTurn, delta);
+    }
+
+    // </Handle controls>
+
+    // Update balls
+    let i = balls.length;
+    let toggleAxis = false;
+
+    // If axes are NOT being displayed correctly
+    if (i > 0)
+        toggleAxis = balls[0].axisHelp.visible != ballAxisVisible;
+
+    // Update ball position + wall collision
+    while (i--) {
+        let ball = balls[i];
+        // Update ball position
+        ball.updatePhysics(delta);
+
+        if (toggleAxis)
+            ball.toggleAxes(ballAxisVisible);
+        // Check wall collision
+        wallCollision(ball);
+    }
+
+    // Ball-to-ball collisions
+    for (let a = 0; a < balls.length; a++)
+        for (let b = a + 1; b < balls.length; b++)
+            balls[a].checkCollision(balls[b]);
+
+    // Update ball cam
+    if (balls.length > 0) {
+        targetBall = balls[balls.length - 1];
+        updateBallCam();
+    }
+
 }
+
+function updateBallCam() {
+    let x = targetBall.position.x + Math.cos(Math.PI) * BALLCAM_DISTANCE;
+    let z = targetBall.position.z + Math.sin(Math.PI) * BALLCAM_DISTANCE;
+    let y = targetBall.position.y + BALCAM_HEIGHT;
+    cameraBall.position.set(x, y, z);
+    cameraBall.lookAt(targetBall.position);
+}
+
 
 function onKeyDown(e) {
     switch (e.code) {
@@ -123,13 +230,22 @@ function onKeyDown(e) {
             rotateBase = -1;
             break;
         case "KeyQ":
-            // TODO: toggle light
+            activeCannon.deselect();
+            activeCannon = cannons[0];
+            activeCannon.select();
             break;
         case "KeyW":
-            // TODO: toggle lighting calculations. whatver that means   
+            activeCannon.deselect();
+            activeCannon = cannons[1];
+            activeCannon.select();
             break;
         case "KeyE":
-            // TODO: toggle type of shadow
+            activeCannon.deselect();
+            activeCannon = cannons[2];
+            activeCannon.select();
+            break;
+        case "KeyR":
+            ballAxisVisible = !ballAxisVisible;
             break;
         case "Digit1":
             activeCam = cams[TOP];
@@ -138,7 +254,7 @@ function onKeyDown(e) {
             activeCam = cams[PERSP];
             break;
         case "Digit3":
-            activeCam = cams[THIRD];
+            activeCam = cams[BALLCAM];
             break;
         case "Digit4":
             toggleWireframe(isWireframe);
