@@ -8,7 +8,7 @@ class Isocaedrus extends THREE.Mesh {
             wireframe: !isWireframe
         });
         super(geometry, material);
-        this.position.y = 0.5;
+        this.position.y = 1;
 
         var axesHelper = new THREE.AxesHelper(1);
         this.add(axesHelper);

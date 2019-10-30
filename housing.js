@@ -23,7 +23,7 @@ class Floor extends THREE.Mesh {
         this.widthX = FLOOR_X;
         this.widthZ = FLOOR_Z;
 
-        this.position.y = -FLOOR_HEIGHT / 2
+        this.position.y = -FLOOR_HEIGHT / 2;
     }
 
     getWidthZ() {
