@@ -2,7 +2,7 @@
 
 // Three js objects
 let cams = [],
-    activeCam, cameraTop, orbitingCam, cameraPerspective, scene, renderer, light;
+    activeCam, cameraTop, orbitingCam, cameraPerspective, scene, renderer, DirectionalLight, spotLights = [];
 
 // Scene objects
 let floor,
@@ -68,23 +68,75 @@ function init() {
     scene.add(floor);
     wall = new Wall(floor.getWidthX(), floor.getWidthZ(), floor.getWidthX() / 2, 0);
     scene.add(wall);
+    
     let icosad = new Icosahedron(0, 0, 0);
     scene.add(icosad);
-
+    
+    /*
     let painting = new Painting();
     scene.add(painting);
+    */
 
     // ######### Lights ############
-    light = new THREE.AmbientLight(0x404040, 10); // soft white light
-    scene.add(light);
-    nevesLights();
 
+    /***************************************************************************
+     * Directional Light
+     * ************************************************************************/
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(-10, 10, 0)
+    scene.add(directionalLight);
+
+    /* Target */
+    let targetDir = new THREE.Object3D();
+    scene.add(targetDir);
+    targetDir.position.set(0, 2, 0);
+    directionalLight.target = targetDir;
+    directionalLight.target.updateMatrixWorld();
+
+    directionalLight.castShadow = true;
+    icosad.castShadow = true;
+    wall.recieveShadow = true;
+    floor.recieveShadow = true;
+
+    /* Helper */
+    let helper = new THREE.DirectionalLightHelper(directionalLight, 1);
+    scene.add(helper);
     
+    /***************************************************************************
+     * SpotLights
+     * ************************************************************************/
+    let spotlight1 = new SpotLight(-10, 6, -7.5, -1 * Math.PI / 4, Math.PI / 4, 0, 0, 0);
+    spotLights.push(spotlight1);
+    let spotlight2 = new SpotLight(10 - 0.5, 6, -7.5, -1 * Math.PI / 4, -1 * Math.PI / 4, 0, 0, 0);
+    spotLights.push(spotlight2);
+    let spotlight3 = new SpotLight(10 - 0.5, 6, 7.5, Math.PI / 4, -1 * Math.PI / 4, 0, 0, 0);
+    spotLights.push(spotlight3);
+    let spotlight4 = new SpotLight(-10, 6, 7.5, Math.PI / 4, Math.PI / 4, 0, 0, 0);
+    spotLights.push(spotlight4);
+
+    spotLights.forEach(light => {
+        scene.add(light);
+    });
+
+    let light1 = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
+    light1.position.set(-10, 6, -7.5);
+    scene.add(light1);
+    let light2 = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
+    light2.position.set(10 - 0.5, 6, -7.5);
+    scene.add(light2);
+    let light3 = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
+    light3.position.set(10 - 0.5, 6, 7.5);
+    scene.add(light3);
+    let light4 = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
+    light4.position.set(-10, 6, 7.5);
+    scene.add(light4);
+
     // ######### Renderer ############
     renderer = new THREE.WebGLRenderer({
         antialias: true,
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
     window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKeyDown);
@@ -126,7 +178,7 @@ function onKeyDown(e) {
             rotateBase = -1;
             break;
         case "KeyQ":
-            // TODO: toggle light
+            directionalLight.visible = !directionalLight.visible;
             break;
         case "KeyW":
             // TODO: toggle lighting calculations. whatver that means   
@@ -196,6 +248,7 @@ function toggleWireframe(bool) {
             toggleWireframeNode(bool, child);
     });
     floor.material.wireframe = false; // Comment this line to dislay floor wireframe
+    wall.material.wireframe = false;
 }
 
 function toggleWireframeNode(bool, obj) {

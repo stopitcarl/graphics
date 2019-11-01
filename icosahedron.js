@@ -22,7 +22,7 @@ class Icosahedron extends THREE.Mesh {
 
         // make pedestal
         let boxGeometry = new THREE.BoxBufferGeometry(2*gold, height, 2*gold);
-        super(boxGeometry, basic);
+        super(boxGeometry, phong);
 
         // make Icosahedron
         // geometry
@@ -39,9 +39,10 @@ class Icosahedron extends THREE.Mesh {
         ];
 
         // slightly shift vertices
+        /*
         for (let i = 0; i < 12; i++) {
             geometry.vertices[11 - i].add(new THREE.Vector3(0, 0, i / 25));
-        }
+        }*/
 
         // faces
         geometry.faces.push(
@@ -62,7 +63,7 @@ class Icosahedron extends THREE.Mesh {
         geometry.computeVertexNormals();
 
         // create icosahedron
-        let icosahedron = new THREE.Mesh(geometry, basic);
+        let icosahedron = new THREE.Mesh(geometry, phong);
         icosahedron.position.y = height / 2 + gold;
         this.add(icosahedron)
 

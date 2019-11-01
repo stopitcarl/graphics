@@ -14,8 +14,8 @@ class Floor extends THREE.Mesh {
 
     constructor() {
         let geometry = new THREE.BoxBufferGeometry(FLOOR_X, FLOOR_HEIGHT, FLOOR_Z);
-        let material = new THREE.MeshBasicMaterial({
-            flatShading: true,
+        let material = new THREE.MeshPhongMaterial({
+            //flatShading: true,
             color: 0x555555,
             // wireframe: true
         });
@@ -39,8 +39,8 @@ class Wall extends THREE.Mesh {
     constructor(widthX, widthZ, x, z) {
         // let screenRatio = window.innerHeight / window.innerWidth;
         let geometry = new THREE.BoxBufferGeometry(1, WALL_HEIGHT, widthZ);
-        let material = new THREE.MeshBasicMaterial({
-            flatShading: true,
+        let material = new THREE.MeshPhongMaterial({
+            //flatShading: true,
             color: 0x888888,
         });
         super(geometry, material);
