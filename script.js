@@ -68,13 +68,16 @@ function init() {
     scene.add(floor);
     wall = new Wall(floor.getWidthX(), floor.getWidthZ(), floor.getWidthX() / 2, 0);
     scene.add(wall);
-    let isocad = new Isocaedrus();
-    scene.add(isocad);
+    let icosad = new Icosahedron(0, 0, 0);
+    scene.add(icosad);
 
+    let painting = new Painting();
+    scene.add(painting);
 
     // ######### Lights ############
     light = new THREE.AmbientLight(0x404040, 10); // soft white light
     scene.add(light);
+    nevesLights();
 
     
     // ######### Renderer ############

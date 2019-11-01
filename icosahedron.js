@@ -1,5 +1,5 @@
-class Isocaedrus extends THREE.Mesh {
-    constructor() {
+class Icosahedron extends THREE.Mesh {
+    constructor(x, y, z) {
         // golden ratio
         let gold = (1 + Math.sqrt(5)) / 2
 
@@ -17,16 +17,19 @@ class Isocaedrus extends THREE.Mesh {
             wireframe: !isWireframe
         });
 
+        // make pedestal
+        let boxGeometry = new THREE.Geometry(); // TODO: write box geoemtry
+        super(boxGeometry, basic);
         // geometry
         let geometry = new THREE.Geometry();
 
         // vertices
         geometry.vertices = [
             new THREE.Vector3(-1, gold, 0), new THREE.Vector3(1, gold, 0),
-            new THREE.Vector3(0, 1, -1*gold), new THREE.Vector3(0, 1, gold),
-            new THREE.Vector3(-1*gold, 0, -1), new THREE.Vector3(gold, 0, -1), new THREE.Vector3(-1*gold, 0, 1), new THREE.Vector3(gold, 0, 1),
-            new THREE.Vector3(0, -1, -1*gold), new THREE.Vector3(0, -1, gold),
-            new THREE.Vector3(-1, -1*gold, 0), new THREE.Vector3(1, -1*gold, 0)
+            new THREE.Vector3(0, 1, -1 * gold), new THREE.Vector3(0, 1, gold),
+            new THREE.Vector3(-1 * gold, 0, -1), new THREE.Vector3(gold, 0, -1), new THREE.Vector3(-1 * gold, 0, 1), new THREE.Vector3(gold, 0, 1),
+            new THREE.Vector3(0, -1, -1 * gold), new THREE.Vector3(0, -1, gold),
+            new THREE.Vector3(-1, -1 * gold, 0), new THREE.Vector3(1, -1 * gold, 0)
         ];
 
         // slightly shift vertices
@@ -51,11 +54,14 @@ class Isocaedrus extends THREE.Mesh {
         // normals
         geometry.computeFaceNormals();
         geometry.computeVertexNormals();
+        let ico = new THREE.Mesh(geometry, material);
+        // TODO: move ico to right spot
+        ico.position.y = y + gold;
+        this.add(ico)
 
-        super(geometry, basic);
-        this.position.x = 0;
-        this.position.y = gold;
-        this.position.z = 0;
+        this.position.x = x;
+        // this.position.y = half the box height;
+        this.position.z = z;
         this.phong = phong;
         this.lambert = lambert;
         this.basic = basic;
