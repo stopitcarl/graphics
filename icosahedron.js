@@ -1,5 +1,8 @@
 class Icosahedron extends THREE.Mesh {
     constructor(x, y, z) {
+        // pedestal height
+        let height = 1
+
         // golden ratio
         let gold = (1 + Math.sqrt(5)) / 2
 
@@ -18,8 +21,10 @@ class Icosahedron extends THREE.Mesh {
         });
 
         // make pedestal
-        let boxGeometry = new THREE.Geometry(); // TODO: write box geoemtry
+        let boxGeometry = new THREE.BoxBufferGeometry(2*gold, height, 2*gold);
         super(boxGeometry, basic);
+
+        // make Icosahedron
         // geometry
         let geometry = new THREE.Geometry();
 
@@ -27,7 +32,8 @@ class Icosahedron extends THREE.Mesh {
         geometry.vertices = [
             new THREE.Vector3(-1, gold, 0), new THREE.Vector3(1, gold, 0),
             new THREE.Vector3(0, 1, -1 * gold), new THREE.Vector3(0, 1, gold),
-            new THREE.Vector3(-1 * gold, 0, -1), new THREE.Vector3(gold, 0, -1), new THREE.Vector3(-1 * gold, 0, 1), new THREE.Vector3(gold, 0, 1),
+            new THREE.Vector3(-1 * gold, 0, -1), new THREE.Vector3(gold, 0, -1),
+            new THREE.Vector3(-1 * gold, 0, 1), new THREE.Vector3(gold, 0, 1),
             new THREE.Vector3(0, -1, -1 * gold), new THREE.Vector3(0, -1, gold),
             new THREE.Vector3(-1, -1 * gold, 0), new THREE.Vector3(1, -1 * gold, 0)
         ];
@@ -54,13 +60,14 @@ class Icosahedron extends THREE.Mesh {
         // normals
         geometry.computeFaceNormals();
         geometry.computeVertexNormals();
-        let ico = new THREE.Mesh(geometry, material);
-        // TODO: move ico to right spot
-        ico.position.y = y + gold;
-        this.add(ico)
+
+        // create icosahedron
+        let icosahedron = new THREE.Mesh(geometry, basic);
+        icosahedron.position.y = height / 2 + gold;
+        this.add(icosahedron)
 
         this.position.x = x;
-        // this.position.y = half the box height;
+        this.position.y = height / 2;
         this.position.z = z;
         this.phong = phong;
         this.lambert = lambert;
