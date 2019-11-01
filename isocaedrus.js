@@ -3,6 +3,20 @@ class Isocaedrus extends THREE.Mesh {
         // golden ratio
         let gold = (1 + Math.sqrt(5)) / 2
 
+        // materials
+        let basic = new THREE.MeshBasicMaterial({
+            color: 0x4083c7,
+            wireframe: !isWireframe
+        });
+        let lambert = new THREE.MeshLambertMaterial({
+            color: 0x4083c7,
+            wireframe: !isWireframe
+        });
+        let phong = new THREE.MeshPhongMaterial({
+            color: 0x4083c7,
+            wireframe: !isWireframe
+        });
+
         // geometry
         let geometry = new THREE.Geometry();
 
@@ -14,6 +28,11 @@ class Isocaedrus extends THREE.Mesh {
             new THREE.Vector3(0, -1, -1*gold), new THREE.Vector3(0, -1, gold),
             new THREE.Vector3(-1, -1*gold, 0), new THREE.Vector3(1, -1*gold, 0)
         ];
+
+        // slightly shift vertices
+        for (let i = 0; i < 12; i++) {
+            geometry.vertices[11 - i].add(new THREE.Vector3(0, 0, i / 25));
+        }
 
         // faces
         geometry.faces.push(
@@ -29,19 +48,14 @@ class Isocaedrus extends THREE.Mesh {
             new THREE.Face3(10, 9, 11), new THREE.Face3(11, 8, 10)
         );
 
-
         // normals
         geometry.computeFaceNormals();
         geometry.computeVertexNormals();
 
-        let material = new THREE.MeshBasicMaterial({
-            color: 0x4083c7,
-            wireframe: !isWireframe
-        });
-        super(geometry, material);
-        this.position.x = 1;
-        this.position.y = 3;
-        this.position.z = 1;
+        super(geometry, basic);
+        this.position.x = 0;
+        this.position.y = gold;
+        this.position.z = 0;
     }
 
     toggleAxes(bool) {
