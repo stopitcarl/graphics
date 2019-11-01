@@ -56,9 +56,20 @@ class Isocaedrus extends THREE.Mesh {
         this.position.x = 0;
         this.position.y = gold;
         this.position.z = 0;
+        this.phong = phong;
+        this.lambert = lambert;
+        this.basic = basic;
     }
 
-    toggleAxes(bool) {
-        this.axisHelp.visible = bool;
+    phong() {
+        this.material = this.phong;
+    }
+
+    lambert() {
+        this.material = this.lambert;
+    }
+
+    basicMaterial() {
+        this.material = this.basic;
     }
 }
