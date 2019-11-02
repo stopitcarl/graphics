@@ -39,10 +39,9 @@ class Icosahedron extends THREE.Mesh {
         ];
 
         // slightly shift vertices
-        /*
         for (let i = 0; i < 12; i++) {
             geometry.vertices[11 - i].add(new THREE.Vector3(0, 0, i / 25));
-        }*/
+        }
 
         // faces
         geometry.faces.push(

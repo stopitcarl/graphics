@@ -17,6 +17,12 @@ class SpotLight extends THREE.Mesh{
         let light = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
         light.position.set(0, 0, 0);
         this.add(light);
+        
+        /* Target */
+        let target = new THREE.Object3D();
+        target.position.set(0, 1.5, 0);
+        light.target = target;
+        scene.add(target);
 
         this.position.set(px, py, pz);
         this.rotation.x = rx;

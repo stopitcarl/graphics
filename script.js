@@ -2,10 +2,11 @@
 
 // Three js objects
 let cams = [],
-    activeCam, cameraTop, orbitingCam, cameraPerspective, scene, renderer, DirectionalLight, spotLights = [];
+    activeCam, cameraTop, orbitingCam, cameraPerspective, scene, renderer, directionalLight, spotLights = [];
 
 // Scene objects
 let floor,
+    wall,
     balls = [],
     cannons = [],
     activeCannon;
@@ -71,7 +72,7 @@ function init() {
     
     let icosad = new Icosahedron(0, 0, 0);
     scene.add(icosad);
-    
+
     /*
     let painting = new Painting();
     scene.add(painting);
@@ -82,6 +83,7 @@ function init() {
     /***************************************************************************
      * Directional Light
      * ************************************************************************/
+
     directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(-10, 10, 0)
     scene.add(directionalLight);
@@ -93,25 +95,21 @@ function init() {
     directionalLight.target = targetDir;
     directionalLight.target.updateMatrixWorld();
 
-    directionalLight.castShadow = true;
-    icosad.castShadow = true;
-    wall.recieveShadow = true;
-    floor.recieveShadow = true;
-
     /* Helper */
     let helper = new THREE.DirectionalLightHelper(directionalLight, 1);
     scene.add(helper);
     
     /***************************************************************************
      * SpotLights
-     * ************************************************************************/
-    let spotlight1 = new SpotLight(-10, 6, -7.5, -1 * Math.PI / 4, Math.PI / 4, 0, 0, 0);
+     **************************************************************************/
+
+    let spotlight1 = new SpotLight(-10, 6, -7.5, -1 * Math.PI / 4, Math.PI / 4);
     spotLights.push(spotlight1);
-    let spotlight2 = new SpotLight(10 - 0.5, 6, -7.5, -1 * Math.PI / 4, -1 * Math.PI / 4, 0, 0, 0);
+    let spotlight2 = new SpotLight(10 - 0.5, 6, -7.5, -1 * Math.PI / 4, -1 * Math.PI / 4);
     spotLights.push(spotlight2);
-    let spotlight3 = new SpotLight(10 - 0.5, 6, 7.5, Math.PI / 4, -1 * Math.PI / 4, 0, 0, 0);
+    let spotlight3 = new SpotLight(10 - 0.5, 6, 7.5, Math.PI / 4, -1 * Math.PI / 4);
     spotLights.push(spotlight3);
-    let spotlight4 = new SpotLight(-10, 6, 7.5, Math.PI / 4, Math.PI / 4, 0, 0, 0);
+    let spotlight4 = new SpotLight(-10, 6, 7.5, Math.PI / 4, Math.PI / 4);
     spotLights.push(spotlight4);
 
     spotLights.forEach(light => {
@@ -128,6 +126,40 @@ function init() {
     window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+
+    /***************************************************************************
+     * Shadows
+     **************************************************************************/
+
+    renderer.shadowMapEnabled = true;
+
+    /* Directional light */
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
+    directionalLight.shadow.camera.near = 5;
+    directionalLight.shadow.camera.far = 20;
+    directionalLight.shadowCameraLeft = -2.5;
+    directionalLight.shadowCameraRight = 2.5;
+    directionalLight.shadowCameraTop = 2.5;
+    directionalLight.shadowCameraBottom = -2.5;
+
+    /* Spotlights */
+    spotLights.forEach(light => {
+        light.children[0].castShadow = true;
+        light.children[0].shadow.mapSize.width = 1024;
+        light.children[0].shadow.mapSize.height = 1024;
+        light.children[0].shadow.camera.near = 5;
+        light.children[0].shadow.camera.far = 30;
+        light.children[0].shadow.camera.fov = 25;
+    });
+
+    /* Objects */
+    icosad.castShadow = true;
+    icosad.children[0].castShadow = true;
+    wall.receiveShadow = true;
+    floor.receiveShadow = true;
+
 }
 
 function animate() {
@@ -163,7 +195,8 @@ function onKeyDown(e) {
             directionalLight.visible = !directionalLight.visible;
             break;
         case "KeyW":
-            // TODO: toggle lighting calculations. whatver that means   
+            // TODO: toggle lighting calculations. whatver that means 
+            // Im pretty sure que a ideia e mudar o material para basic  
             break;
         case "KeyE":
             // TODO: toggle type of shadow
@@ -186,18 +219,8 @@ function onKeyDown(e) {
     }
 }
 
-
 function onKeyUp(e) {
     switch (e.code) {
-        case "ArrowLeft":
-            if (cannonTurn > 0)
-                break;
-            cannonTurn = 0;
-        case "ArrowRight":
-            if (cannonTurn < 0)
-                break;
-            cannonTurn = 0;
-            break;
         default:
             break;
     }
