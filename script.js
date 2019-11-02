@@ -118,19 +118,6 @@ function init() {
         scene.add(light);
     });
 
-    let light1 = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
-    light1.position.set(-10, 6, -7.5);
-    scene.add(light1);
-    let light2 = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
-    light2.position.set(10 - 0.5, 6, -7.5);
-    scene.add(light2);
-    let light3 = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
-    light3.position.set(10 - 0.5, 6, 7.5);
-    scene.add(light3);
-    let light4 = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
-    light4.position.set(-10, 6, 7.5);
-    scene.add(light4);
-
     // ######### Renderer ############
     renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -160,22 +147,17 @@ function update() {
 
 function onKeyDown(e) {
     switch (e.code) {
-        case "ArrowLeft":
-            // cameraPerspective.position.z -= 1;
-            cannonTurn = -1;
+        case "Digit1":
+            spotLights[0].switch();
             break;
-        case "ArrowRight":
-            // cameraPerspective.position.z += 1;
-            cannonTurn = 1;
+        case "Digit2":
+            spotLights[1].switch();
             break;
-        case "Space":
-            isShoot = true;
+        case "Digit3":
+            spotLights[2].switch();
             break;
-        case "KeyA":
-            rotateBase = 1;
-            break;
-        case "KeyS":
-            rotateBase = -1;
+        case "Digit4":
+            spotLights[3].switch();
             break;
         case "KeyQ":
             directionalLight.visible = !directionalLight.visible;
@@ -186,16 +168,16 @@ function onKeyDown(e) {
         case "KeyE":
             // TODO: toggle type of shadow
             break;
-        case "Digit1":
+        case "KeyA":
             activeCam = cams[TOP];
             break;
-        case "Digit2":
+        case "KeyS":
             activeCam = cams[PERSP];
             break;
-        case "Digit3":
+        case "KeyD":
             activeCam = cams[THIRD];
             break;
-        case "Digit4":
+        case "Digit5":
             toggleWireframe(isWireframe);
             isWireframe = !isWireframe;
             break;
