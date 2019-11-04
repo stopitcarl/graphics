@@ -14,26 +14,36 @@ class Painting extends THREE.Mesh {
         let objects = [];
 
 
-
-        // 5x2.5 car with 0.5 radius wheels
         let geometry = new THREE.BoxBufferGeometry(PAINTING_HEIGHT, PAINTING_THICK, PAINTING_WIDTH);
-        let material = new THREE.MeshBasicMaterial({
+        let basicM = new THREE.MeshBasicMaterial({
             // flatShading: true,
             color: 0x666666,
-            wireframe: !isWireframe
+            
+        });
+        let lambertM = new THREE.MeshLambertMaterial({
+            color: 0x666666,
+            
+        });
+        let phongM = new THREE.MeshPhongMaterial({
+            color: 0x666666,
+            
         });
 
-        super(geometry, material);
+        super(geometry, phongM);
         this.position.y = pos.y;
         this.position.z = pos.z;
         this.position.x = pos.x - PAINTING_THICK / 2;
-        this.height
+        this.objects = objects;
+        this.basicM = basicM;
+        this.lambertM = lambertM;
+        this.phongM = phongM;
 
         for (var j = 0; j < nRows; j++) { // How many rows
             for (var i = 0; i < nCols; i++) { // How many cols
                 let cylinder = new Cylinder(a / 2,
                     -PAINTING_HEIGHT / 2 + a / 2 + j * b,
                     -PAINTING_WIDTH / 2 + a / 2 + i * b);
+                objects.push(cylinder);
                 this.add(cylinder);
                 if (j > nRows - 2)
                     continue;
@@ -43,18 +53,11 @@ class Painting extends THREE.Mesh {
                     -PAINTING_HEIGHT / 2 + a / 2 + b / 2 + b * j,
                     -PAINTING_WIDTH / 2 + a / 2 + b / 2 + b * i);
                 this.add(box);
+                objects.push(box);
             }
         }
 
         this.rotation.z -= Math.PI / 2;
-
-        function createCylinder(radius, x, z) {
-            let height = 0.2
-            let geometry = new THREE.CylinderBufferGeometry(radius, radius, height, 10);
-            var ball = new THREE.Mesh(geometry, whiteMaterial);
-            ball.position.set(x, -(height / 2 + PAINTING_THICK / 2), z);
-            return ball;
-        }
 
     }
 
@@ -67,33 +70,58 @@ class Painting extends THREE.Mesh {
     }
 
     phong() {
-        return PAINTING_WIDTH;
+        this.material = this.phongM;
+        this.objects.forEach(obj => {
+            obj.phong();
+        });
+    }
+
+    lambert() {
+        this.material = this.lambertM;
+        this.objects.forEach(obj => {
+            obj.lambert();
+        });
+    }
+
+    basic() {
+        this.material = this.basicM;
+        this.objects.forEach(obj => {
+            obj.basic();
+        });
     }
 }
 
 class Box extends THREE.Mesh {
     constructor(side, x, z) {
         let height = 0.2
-        var basic = new THREE.MeshBasicMaterial({
+        var basicM = new THREE.MeshBasicMaterial({
             // flatShading: true,
-            color: 0x000000,
-            wireframe: !isWireframe
+            color: 0x000000            
         });
-        let lambert = new THREE.MeshLambertMaterial({
-            color: 0x000000,
-            wireframe: !isWireframe
+        let lambertM = new THREE.MeshLambertMaterial({
+            color: 0x000000            
         });
-        let phong = new THREE.MeshPhongMaterial({
-            color: 0x000000,
-            wireframe: !isWireframe
+        let phongM = new THREE.MeshPhongMaterial({
+            color: 0x000000            
         });
 
         let geometry = new THREE.BoxBufferGeometry(side, height, side);
-        super(geometry, basic);
+        super(geometry, phongM);
         this.position.set(x, -(height / 2 + PAINTING_THICK / 2), z);
-        this.basic = basic;
-        this.lambert = lambert;
-        this.phong = phong;
+        this.basicM = basicM;
+        this.lambertM = lambertM;
+        this.phongM = phongM;
+    }
+    phong() {
+        this.material = this.phongM;
+    }
+
+    lambert() {
+        this.material = this.lambertM;
+    }
+
+    basic() {
+        this.material = this.basicM;
     }
 }
 
@@ -101,24 +129,35 @@ class Box extends THREE.Mesh {
 class Cylinder extends THREE.Mesh {
     constructor(radius, x, z) {
         let height = 0.2
-        var basic = new THREE.MeshBasicMaterial({
+        var basicM = new THREE.MeshBasicMaterial({
             // flatShading: true,
             color: 0xffffff,
-            wireframe: !isWireframe
+            
         });
-        let lambert = new THREE.MeshLambertMaterial({
+        let lambertM = new THREE.MeshLambertMaterial({
             color: 0xffffff,
-            wireframe: !isWireframe
+            
         });
-        let phong = new THREE.MeshPhongMaterial({
+        let phongM = new THREE.MeshPhongMaterial({
             color: 0xffffff,
-            wireframe: !isWireframe
+            
         });
         let geometry = new THREE.CylinderBufferGeometry(radius, radius, height, 10);
-        super(geometry, basic);
+        super(geometry, phongM);
         this.position.set(x, -(height / 2 + PAINTING_THICK / 2), z);
-        this.basic = basic;
-        this.lambert = lambert;
-        this.phong = phong;
+        this.basicM = basicM;
+        this.lambertM = lambertM;
+        this.phongM = phongM;
+    }
+    phong() {
+        this.material = this.phongM;
+    }
+
+    lambert() {
+        this.material = this.lambertM;
+    }
+
+    basic() {
+        this.material = this.basicM;
     }
 }

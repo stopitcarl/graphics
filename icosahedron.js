@@ -7,22 +7,19 @@ class Icosahedron extends THREE.Mesh {
         let gold = (1 + Math.sqrt(5)) / 2
 
         // materials
-        let basic = new THREE.MeshBasicMaterial({
-            color: 0x4083c7,
-            wireframe: !isWireframe
+        let basicM = new THREE.MeshBasicMaterial({
+            color: 0x4083c7,            
         });
-        let lambert = new THREE.MeshLambertMaterial({
-            color: 0x4083c7,
-            wireframe: !isWireframe
+        let lambertM = new THREE.MeshLambertMaterial({
+            color: 0x4083c7,            
         });
-        let phong = new THREE.MeshPhongMaterial({
-            color: 0x4083c7,
-            wireframe: !isWireframe
+        let phongM = new THREE.MeshPhongMaterial({
+            color: 0x4083c7,            
         });
 
         // make pedestal
         let boxGeometry = new THREE.BoxBufferGeometry(2 * gold, height, 2 * gold);
-        super(boxGeometry, phong);
+        super(boxGeometry, phongM);
 
         // make Icosahedron
         // geometry
@@ -40,7 +37,7 @@ class Icosahedron extends THREE.Mesh {
 
         // slightly shift vertices
         for (let i = 0; i < 12; i++) {
-            geometry.vertices[11 - i].add(new THREE.Vector3(0, 0, i / 25));
+            geometry.vertices[11 - i].add(new THREE.Vector3(0, 0, i / 15));
         }
 
         // faces
@@ -62,27 +59,30 @@ class Icosahedron extends THREE.Mesh {
         geometry.computeVertexNormals();
 
         // create icosahedron
-        let icosahedron = new THREE.Mesh(geometry, phong);
-        icosahedron.position.y = height / 2 + gold;
-        this.add(icosahedron)
+        this.icosahedron = new THREE.Mesh(geometry, phongM);
+        this.icosahedron.position.y = height / 2 + gold;
+        this.add(this.icosahedron);
 
         this.position.x = x;
         this.position.y = height / 2;
         this.position.z = z;
-        this.phong = phong;
-        this.lambert = lambert;
-        this.basic = basic;
+        this.phongM = phongM;
+        this.lambertM = lambertM;
+        this.basicM = basicM;
     }
 
     phong() {
-        this.material = this.phong;
+        this.icosahedron.material = this.phongM;
+        this.material = this.phongM;
     }
 
     lambert() {
-        this.material = this.lambert;
+        this.icosahedron.material = this.lambertM;
+        this.material = this.lambertM;
     }
 
-    basicMaterial() {
-        this.material = this.basic;
+    basic() {
+        this.icosahedron.material = this.basicM;
+        this.material = this.basicM;
     }
 }

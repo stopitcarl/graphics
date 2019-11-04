@@ -1,4 +1,4 @@
-class SpotLight extends THREE.Mesh{
+class SpotLight extends THREE.Mesh {
 
     constructor(px, py, pz, rx, rz) {
 
@@ -13,12 +13,21 @@ class SpotLight extends THREE.Mesh{
 
         super(geometry, material);
 
-        /* Light */
+        //  Light 
         let light = new THREE.SpotLight(0xffffff, 1, 20, 0.4, 0, 0);
         light.position.set(0, 0, 0);
         this.add(light);
-        
-        /* Target */
+        // Sphere 
+        let geo = new THREE.SphereGeometry(0.4, 10, 10);
+        let mat = new THREE.MeshBasicMaterial({
+            color: 0xf5f549,
+            wireframe: !isWireframe
+        });
+        let sphere = new THREE.Mesh(geo, mat);
+        sphere.position.set(0, -0.5, 0);
+        this.add(sphere);
+
+        // Target 
         let target = new THREE.Object3D();
         target.position.set(0, 1.5, 0);
         light.target = target;
@@ -29,8 +38,8 @@ class SpotLight extends THREE.Mesh{
         this.rotation.z = rz;
     }
 
-    switch() {
+    switch () {
         this.visible = !this.visible;
     }
-    
+
 }
