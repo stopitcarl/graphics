@@ -2,34 +2,23 @@
 
 // Three js objects
 let cams = [],
-    activeCam, cameraTop, orbitingCam, cameraPerspective, scene, renderer, directionalLight, spotLights = [];
+    activeCam, scene, renderer, directionalLight, spotLights = [];
 
 // Scene objects
 let floor,
     wall,
-    balls = [],
-    cannons = [],
-    activeCannon;
-
-// Control flags
-let rotateBase = 0,
-    rotateMainJoint = 0,
-    cannonTurn = 0,
-    targetBall,
-    isShoot = false;
+    painting;
 
 
-var isWireframe = false,
-    ballAxisVisible = true,
+var isWireframe = false,    
     clock,
     timeElapsed = 0;
-
-let CAM_ZOOM = 20;    
 
 // camera shortcuts
 let TOP = 0,
     PERSP = 1,
-    THIRD = 2;
+    THIRD = 2,
+    PAINT = 3;
 
 
 init();
@@ -45,38 +34,43 @@ function init() {
     let viewSize = 30;
     let aspectRatio = window.innerWidth / window.innerHeight;
     // Top camera (1)
-    cameraTop = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
+    let cameraTop = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
         viewSize / 2, viewSize / -2, -100, 100);
     cameraTop.position.y = 4;
     cameraTop.lookAt(scene.position);
     cams.push(cameraTop);
     // Perspective camera (2)
-    cameraPerspective = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-    cameraPerspective.position.set(-28, 12, 11);
+    let cameraPerspective = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    cameraPerspective.position.set(-21, 12, 11);
     cameraPerspective.lookAt(scene.position);
     cams.push(cameraPerspective);
     // Ball camera (3)
-    orbitingCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-    orbitingCam.position.set(-32, 12, 0);
+    let orbitingCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    orbitingCam.position.set(-22, 12, 0);
     orbitingCam.lookAt(scene.position);
     cams.push(orbitingCam);
-
-    activeCam = cams[PERSP];    
 
 
     // ######### Objects ############
     floor = new Floor();
     scene.add(floor);
-    wall = new Wall(floor.getWidthX(), floor.getWidthZ(), floor.getWidthX() / 2, 0);
+    wall = new Wall(floor.getWidthZ() / 3, 0, floor.getWidthZ() / 5);
     scene.add(wall);
-    
-    let icosad = new Icosahedron(0, 0, 0);
+
+    let icosad = new Icosahedron(0, -floor.getWidthZ() / 5);
     scene.add(icosad);
 
-    /*
-    let painting = new Painting();
+    let painting = new Painting(wall.getWallCenter());
     scene.add(painting);
-    */
+    let painting_pos = painting.getCenter();
+    // Paint camera (4)
+    viewSize = painting.getWidth() + 2;
+    let cameraPaint = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
+        viewSize / 2, viewSize / -2, 0, 100);
+    cameraPaint.position.set(painting_pos.x - 5, painting_pos.y, painting_pos.z);
+    cameraPaint.lookAt(painting_pos);
+    cams.push(cameraPaint);
+    activeCam = cams[PAINT];
 
     // ######### Lights ############
 
@@ -98,7 +92,7 @@ function init() {
     /* Helper */
     let helper = new THREE.DirectionalLightHelper(directionalLight, 1);
     scene.add(helper);
-    
+
     /***************************************************************************
      * SpotLights
      **************************************************************************/
@@ -131,7 +125,7 @@ function init() {
      * Shadows
      **************************************************************************/
 
-    renderer.shadowMapEnabled = true;
+    renderer.shadowMap.enabled = true;
 
     /* Directional light */
     directionalLight.castShadow = true;
@@ -139,10 +133,10 @@ function init() {
     directionalLight.shadow.mapSize.height = 1024;
     directionalLight.shadow.camera.near = 5;
     directionalLight.shadow.camera.far = 20;
-    directionalLight.shadowCameraLeft = -2.5;
-    directionalLight.shadowCameraRight = 2.5;
-    directionalLight.shadowCameraTop = 2.5;
-    directionalLight.shadowCameraBottom = -2.5;
+    directionalLight.shadow.camera.left = -2.5;
+    directionalLight.shadow.camera.right = 2.5;
+    directionalLight.shadow.camera.top = 2.5;
+    directionalLight.shadow.camera.bottom = -2.5;
 
     /* Spotlights */
     spotLights.forEach(light => {
@@ -174,7 +168,7 @@ function animate() {
 
 function update() {
     // TODO: Delete function and all calls to it    
-    
+
 }
 
 function onKeyDown(e) {
@@ -210,6 +204,9 @@ function onKeyDown(e) {
         case "KeyD":
             activeCam = cams[THIRD];
             break;
+        case "KeyF":
+            activeCam = cams[PAINT];
+            break;
         case "Digit5":
             toggleWireframe(isWireframe);
             isWireframe = !isWireframe;
@@ -229,21 +226,36 @@ function onKeyUp(e) {
 function onResize() {
     'use strict'
 
-    if (window.innerHeight > 0 && window.innerWidth > 0) {
+    if (window.innerHeight > 0 && window.innerWidth > 0) {        
+        renderer.setSize(window.innerWidth, window.innerHeight);
         cams.forEach(cam => {
             renderer.setSize(window.innerWidth, window.innerHeight);
             cam.aspect = window.innerWidth / window.innerHeight;
             cam.updateProjectionMatrix();
         });
 
-        let viewSize = 30;
+        viewSize = painting.getWidth() + 2;
         let aspectRatio = window.innerWidth / window.innerHeight;
 
-        cameraTop.left = aspectRatio * viewSize / -2;
-        cameraTop.right = aspectRatio * viewSize / 2;
-        cameraTop.top = viewSize / 2;
-        cameraTop.bottom = viewSize / -2;
-        cameraTop.updateProjectionMatrix();
+        activeCam.left = aspectRatio * viewSize / -2;
+        activeCam.right = aspectRatio * viewSize / 2;
+        activeCam.top = viewSize / 2;
+        activeCam.bottom = viewSize / -2;
+        activeCam.updateProjectionMatrix();
+
+        cams[PERSP].left = aspectRatio * viewSize / -2;
+        cams[PERSP].right = aspectRatio * viewSize / 2;
+        cams[PERSP].top = viewSize / 2;
+        cams[PERSP].bottom = viewSize / -2;
+        cams[PERSP].updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        cams[PAINT].left = aspectRatio * viewSize / -2;
+        cams[PAINT].right = aspectRatio * viewSize / 2;
+        cams[PAINT].top = viewSize / 2;
+        cams[PAINT].bottom = viewSize / -2;
+        cams[PAINT].updateProjectionMatrix();
+        
     }
 }
 

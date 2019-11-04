@@ -1,5 +1,5 @@
 class Icosahedron extends THREE.Mesh {
-    constructor(x, y, z) {
+    constructor(x, z) {
         // pedestal height
         let height = 1
 
@@ -21,7 +21,7 @@ class Icosahedron extends THREE.Mesh {
         });
 
         // make pedestal
-        let boxGeometry = new THREE.BoxBufferGeometry(2*gold, height, 2*gold);
+        let boxGeometry = new THREE.BoxBufferGeometry(2 * gold, height, 2 * gold);
         super(boxGeometry, phong);
 
         // make Icosahedron

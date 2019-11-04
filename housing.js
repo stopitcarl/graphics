@@ -36,7 +36,7 @@ class Floor extends THREE.Mesh {
 }
 
 class Wall extends THREE.Mesh {
-    constructor(widthX, widthZ, x, z) {
+    constructor(widthZ, x, z) {
         // let screenRatio = window.innerHeight / window.innerWidth;
         let geometry = new THREE.BoxBufferGeometry(1, WALL_HEIGHT, widthZ);
         let material = new THREE.MeshPhongMaterial({
@@ -47,5 +47,9 @@ class Wall extends THREE.Mesh {
         this.position.x = x;
         this.position.z = z;
         this.position.y = WALL_HEIGHT / 2;
+    }
+
+    getWallCenter() {
+        return this.position.clone().add(new THREE.Vector3(-0.5, 0, 0));
     }
 }
