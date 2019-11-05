@@ -39,14 +39,38 @@ class Wall extends THREE.Mesh {
     constructor(widthZ, x, z) {
         // let screenRatio = window.innerHeight / window.innerWidth;
         let geometry = new THREE.BoxBufferGeometry(1, WALL_HEIGHT, widthZ);
-        let material = new THREE.MeshPhongMaterial({
-            //flatShading: true,
-            color: 0x888888,
+
+        let basicM = new THREE.MeshBasicMaterial({
+            // flatShading: true,
+            color: 0x888888
         });
-        super(geometry, material);
+        let lambertM = new THREE.MeshLambertMaterial({
+            color: 0x888888
+
+        });
+        let phongM = new THREE.MeshPhongMaterial({
+            color: 0x888888,
+
+        });
+        super(geometry, phongM);
         this.position.x = x;
         this.position.z = z;
         this.position.y = WALL_HEIGHT / 2;
+        this.phongM = phongM;
+        this.lambertM = lambertM;
+        this.basicM = basicM;
+    }
+
+    phong() {
+        this.material = this.phongM;
+    }
+
+    lambert() {
+        this.material = this.lambertM;
+    }
+
+    basic() {
+        this.material = this.basicM;
     }
 
     getWallCenter() {

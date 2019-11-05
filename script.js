@@ -184,13 +184,16 @@ function update() {
     if (isBasic) {
         icosad.basic();
         painting.basic();
+        painting.basic();
     } else {
         if (isLambert) {
             icosad.lambert();
             painting.lambert();
+            wall.lambert();
         } else {
             icosad.phong();
             painting.phong();
+            wall.phong();
         }
     }
 
@@ -246,11 +249,10 @@ function onResize() {
     'use strict'
 
     if (window.innerHeight > 0 && window.innerWidth > 0) {
-        renderer.setSize(window.innerWidth, window.innerHeight);
         cams.forEach(cam => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
             cam.aspect = window.innerWidth / window.innerHeight;
             cam.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
         let aspectRatio = window.innerWidth / window.innerHeight;
@@ -277,6 +279,15 @@ function onResize() {
             cams[PAINT].bottom = viewSize / aspectRatio / -2;
             cams[PAINT].updateProjectionMatrix();
         }
+
+
+        // if (aspectRatio < 1) {
+        //     cams[PERSP].fov = 45 / Math.sqrt(aspect);
+        //     cams[PERSP].updateProjectionMatrix();
+        // } else {
+        //     cams[PERSP].fov = 45;
+        //     cams[PERSP].updateProjectionMatrix();
+        // }
     }
 }
 

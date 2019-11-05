@@ -18,7 +18,7 @@ class Painting extends THREE.Mesh {
         let frame1 = new THREE.BoxBufferGeometry(PAINTING_THICK, PAINTING_THICK, PAINTING_WIDTH);
         let frame2 = new THREE.BoxBufferGeometry(PAINTING_HEIGHT + 2 * PAINTING_THICK, PAINTING_THICK, PAINTING_THICK);
 
-        let newM = new THREE.MeshBasicMaterial({
+        let newM = new THREE.MeshPhongMaterial({
             // flatShading: true,
             color: 0x111111
         });
