@@ -1,5 +1,5 @@
 var PAINTING_WIDTH = 4,
-    PAINTING_THICK = 0.4;
+    PAINTING_THICK = 0.2;
 
 
 
@@ -15,18 +15,25 @@ class Painting extends THREE.Mesh {
 
 
         let geometry = new THREE.BoxBufferGeometry(PAINTING_HEIGHT, PAINTING_THICK, PAINTING_WIDTH);
+        let frame1 = new THREE.BoxBufferGeometry(PAINTING_THICK, PAINTING_THICK, PAINTING_WIDTH);
+        let frame2 = new THREE.BoxBufferGeometry(PAINTING_HEIGHT + 2 * PAINTING_THICK, PAINTING_THICK, PAINTING_THICK);
+
+        let newM = new THREE.MeshBasicMaterial({
+            // flatShading: true,
+            color: 0x111111
+        });
+
         let basicM = new THREE.MeshBasicMaterial({
             // flatShading: true,
-            color: 0x666666,
-            
+            color: 0x666666
         });
         let lambertM = new THREE.MeshLambertMaterial({
-            color: 0x666666,
-            
+            color: 0x666666
+
         });
         let phongM = new THREE.MeshPhongMaterial({
             color: 0x666666,
-            
+
         });
 
         super(geometry, phongM);
@@ -56,6 +63,23 @@ class Painting extends THREE.Mesh {
                 objects.push(box);
             }
         }
+        this.add()
+
+        // Frame
+        let f1 = new THREE.Mesh(frame1, newM);
+        f1.position.x = -PAINTING_HEIGHT / 2 - PAINTING_THICK / 2;
+        this.add(f1);
+        let f2 = new THREE.Mesh(frame1, newM);
+        f2.position.x = +PAINTING_HEIGHT / 2 + PAINTING_THICK / 2;
+        this.add(f2);
+        let f3 = new THREE.Mesh(frame2, newM);
+        f3.position.z = -PAINTING_WIDTH / 2 - PAINTING_THICK / 2;
+        this.add(f3);
+        let f4 = new THREE.Mesh(frame2, newM);
+        f4.position.z = PAINTING_WIDTH / 2 + PAINTING_THICK / 2;
+        this.add(f4);
+
+
 
         this.rotation.z -= Math.PI / 2;
 
@@ -96,13 +120,13 @@ class Box extends THREE.Mesh {
         let height = 0.2
         var basicM = new THREE.MeshBasicMaterial({
             // flatShading: true,
-            color: 0x000000            
+            color: 0x000000
         });
         let lambertM = new THREE.MeshLambertMaterial({
-            color: 0x000000            
+            color: 0x000000
         });
         let phongM = new THREE.MeshPhongMaterial({
-            color: 0x000000            
+            color: 0x000000
         });
 
         let geometry = new THREE.BoxBufferGeometry(side, height, side);
@@ -132,15 +156,15 @@ class Cylinder extends THREE.Mesh {
         var basicM = new THREE.MeshBasicMaterial({
             // flatShading: true,
             color: 0xffffff,
-            
+
         });
         let lambertM = new THREE.MeshLambertMaterial({
             color: 0xffffff,
-            
+
         });
         let phongM = new THREE.MeshPhongMaterial({
             color: 0xffffff,
-            
+
         });
         let geometry = new THREE.CylinderBufferGeometry(radius, radius, height, 10);
         super(geometry, phongM);

@@ -130,8 +130,8 @@ function init() {
 
     /* Directional light */
     directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 30;
-    directionalLight.shadow.mapSize.height = 30;
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
     directionalLight.shadow.camera.near = 5;
     directionalLight.shadow.camera.far = 20;
     directionalLight.shadow.camera.left = -2.5;
