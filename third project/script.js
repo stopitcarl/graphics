@@ -39,10 +39,17 @@ function init() {
      * Objects
      * ************************************************************************/
     floor = new Floor();
-    scene.add(floor);    
+    scene.add(floor);
+    wall = new Wall(floor.getWidthZ() / 3, 0, floor.getWidthZ() / 5);
+    scene.add(wall);
 
     icosad = new Icosahedron(0, -floor.getWidthZ() / 5);
     scene.add(icosad);
+
+    painting = new Painting(wall.getWallCenter());
+    scene.add(painting);
+    let painting_pos = painting.getCenter();
+
 
 
     /***************************************************************************
@@ -54,13 +61,13 @@ function init() {
     perspFront.lookAt(scene.position);
     cams.push(perspFront);
     // Paint camera (1)
-    // viewSize = painting.getWidth() + 2;
-    // let aspectRatio = window.innerWidth / window.innerHeight;
-    // let cameraPaint = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
-    //     viewSize / 2, viewSize / -2, 0, 100);
-    // cameraPaint.position.set(painting_pos.x - 5, painting_pos.y, painting_pos.z);
-    // cameraPaint.lookAt(painting_pos);
-    // cams.push(cameraPaint);
+    viewSize = painting.getWidth() + 2;
+    let aspectRatio = window.innerWidth / window.innerHeight;
+    let cameraPaint = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
+        viewSize / 2, viewSize / -2, 0, 100);
+    cameraPaint.position.set(painting_pos.x - 5, painting_pos.y, painting_pos.z);
+    cameraPaint.lookAt(painting_pos);
+    cams.push(cameraPaint);
 
     activeCam = cams[PERSP];
 
@@ -70,7 +77,7 @@ function init() {
      * Directional Light
      * ************************************************************************/
 
-    directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(-10, 10, 0)
     scene.add(directionalLight);
 
@@ -89,20 +96,20 @@ function init() {
      * SpotLights
      **************************************************************************/
 
-    // let spotlight1 = new SpotLight(-10, 6, -7.5, -1 * Math.PI / 4, Math.PI / 4);
-    // spotLights.push(spotlight1);
-    // let spotlight2 = new SpotLight(10 - 0.5, 6, -7.5, -1 * Math.PI / 4, -1 * Math.PI / 4);
-    // spotLights.push(spotlight2);
-    // let spotlight3 = new SpotLight(10 - 0.5, 6, 7.5, Math.PI / 4, -1 * Math.PI / 4);
-    // spotLights.push(spotlight3);
-    // let spotlight4 = new SpotLight(-10, 6, 7.5, Math.PI / 4, Math.PI / 4);
-    // spotLights.push(spotlight4);
-    // lightOn.push(false);
+    let spotlight1 = new SpotLight(-10, 6, -7.5, -1 * Math.PI / 4, Math.PI / 4);
+    spotLights.push(spotlight1);
+    let spotlight2 = new SpotLight(10 - 0.5, 6, -7.5, -1 * Math.PI / 4, -1 * Math.PI / 4);
+    spotLights.push(spotlight2);
+    let spotlight3 = new SpotLight(10 - 0.5, 6, 7.5, Math.PI / 4, -1 * Math.PI / 4);
+    spotLights.push(spotlight3);
+    let spotlight4 = new SpotLight(-10, 6, 7.5, Math.PI / 4, Math.PI / 4);
+    spotLights.push(spotlight4);
+    lightOn.push(false);
 
-    // spotLights.forEach(light => {
-    //     scene.add(light);
-    //     lightOn.push(false);
-    // });
+    spotLights.forEach(light => {
+        scene.add(light);
+        lightOn.push(false);
+    });
 
     // ######### Renderer ############
     renderer = new THREE.WebGLRenderer({
@@ -143,10 +150,10 @@ function init() {
     });
 
     /* Objects */
-    // icosad.castShadow = true;
-    // icosad.children[0].castShadow = true;
-    // wall.receiveShadow = true;
-    // floor.receiveShadow = true;
+    icosad.castShadow = true;
+    icosad.children[0].castShadow = true;
+    wall.receiveShadow = true;
+    floor.receiveShadow = true;
 
 }
 
@@ -161,17 +168,67 @@ function animate() {
 }
 
 function update() {
-    // TODO: rotate cube?
+    for (var i = 1; i < lightOn.length; i++)
+        if (lightOn[i]) {
+            spotLights[i - 1].switch();
+            lightOn[i] = false;
+        }
+
+    // Big direcitonal light
+    if (lightOn[0]) {
+        directionalLight.visible = !directionalLight.visible;
+        lightOn[0] = false;
+    }
+
+
+    if (isBasic) {
+        icosad.basic();
+        painting.basic();
+        painting.basic();
+    } else {
+        if (isLambert) {
+            icosad.lambert();
+            painting.lambert();
+            wall.lambert();
+        } else {
+            icosad.phong();
+            painting.phong();
+            wall.phong();
+        }
+    }
+
+
 }
 
 function onKeyDown(e) {
-    switch (e.code) {        
-        case "KeyQ":
+    switch (e.code) {
+        case "Digit1":
+            lightOn[1] = true;
+            break;
+        case "Digit2":
+            lightOn[2] = true;
+            break;
+        case "Digit3":
+            lightOn[3] = true;
+            break;
+        case "Digit4":
+            lightOn[4] = true;
+            break;
+        case "Digit5":
             activeCam = cams[PERSP];
             break;
-        case "KeyW":
+        case "Digit6":
             activeCam = cams[PAINT];
-            break;        
+            break;
+        case "KeyQ":
+            lightOn[0] = true;
+            break;
+        case "KeyW":
+            isBasic = !isBasic;
+            break;
+        case "KeyE":
+            isLambert = !isLambert;
+            break;
         case "KeyK":
             toggleWireframe(isWireframe);
             isWireframe = !isWireframe;

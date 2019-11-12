@@ -18,9 +18,16 @@ class Painting extends THREE.Mesh {
         let frame1 = new THREE.BoxBufferGeometry(PAINTING_THICK, PAINTING_THICK, PAINTING_WIDTH);
         let frame2 = new THREE.BoxBufferGeometry(PAINTING_HEIGHT + 2 * PAINTING_THICK, PAINTING_THICK, PAINTING_THICK);
 
-        let newM = new THREE.MeshPhongMaterial({
+        let basicF = new THREE.MeshBasicMaterial({
             // flatShading: true,
-            color: 0x111111
+            color: 0x666666
+        });
+        let lambertF = new THREE.MeshLambertMaterial({
+            color: 0x666666
+
+        });
+        let phongF = new THREE.MeshPhongMaterial({
+            color: 0x666666
         });
 
         let basicM = new THREE.MeshBasicMaterial({
@@ -66,10 +73,10 @@ class Painting extends THREE.Mesh {
         this.add()
 
         // Frame
-        let f1 = new THREE.Mesh(frame1, newM);
+        let f1 = new THREE.Mesh(frame1, phongF);
         f1.position.x = -PAINTING_HEIGHT / 2 - PAINTING_THICK / 2;
         this.add(f1);
-        let f2 = new THREE.Mesh(frame1, newM);
+        let f2 = new THREE.Mesh(frame1, phongF);
         f2.position.x = +PAINTING_HEIGHT / 2 + PAINTING_THICK / 2;
         this.add(f2);
         let f3 = new THREE.Mesh(frame2, newM);
@@ -172,6 +179,44 @@ class Cylinder extends THREE.Mesh {
         this.basicM = basicM;
         this.lambertM = lambertM;
         this.phongM = phongM;
+    }
+    phong() {
+        this.material = this.phongM;
+    }
+
+    lambert() {
+        this.material = this.lambertM;
+    }
+
+    basic() {
+        this.material = this.basicM;
+    }
+}
+
+
+class Frame extends THREE.Mesh {
+    constructor(width, height, depth, x, y, z) {
+        let height = 0.2
+        var basicM = new THREE.MeshBasicMaterial({
+            // flatShading: true,
+            color: 0x000000
+        });
+        let lambertM = new THREE.MeshLambertMaterial({
+            color: 0x000000
+        });
+        let phongM = new THREE.MeshPhongMaterial({
+            color: 0x000000
+        });
+
+        let geometry = new THREE.BoxBufferGeometry(width, height, depth);
+        super(geometry, phongM);
+        this.position.set(x, -(height / 2 + PAINTING_THICK / 2), z);
+        this.basicM = basicM;
+        this.lambertM = lambertM;
+        this.phongM = phongM;
+        this.position.x = x;
+        this.position.y = y;
+        this.position.z = z;
     }
     phong() {
         this.material = this.phongM;
