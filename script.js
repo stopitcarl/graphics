@@ -8,7 +8,7 @@ let cams = [],
 var floor,
     wall,
     painting,
-    icosad,
+    ball,
     dice;
 
 
@@ -23,7 +23,8 @@ let PERSP = 0,
 // flags
 let lightOn = [],
     isBasic = false,
-    isLambert = false;
+    isLambert = false,
+    toggleAccel = false;
 
 
 init();
@@ -44,6 +45,9 @@ function init() {
 
     dice = new Dice();
     scene.add(dice);
+
+    ball = new Ball();
+    scene.add(ball);
 
     /***************************************************************************
      * Cameras
@@ -165,6 +169,11 @@ function update() {
     let delta = clock.getDelta();
 
     dice.update(delta);
+    if (toggleAccel) {
+        ball.toggleAcceleration();
+        toggleAccel = false;
+    }
+    ball.updatePhysics(delta);
 
 }
 
@@ -179,6 +188,9 @@ function onKeyDown(e) {
         case "KeyK":
             toggleWireframe(isWireframe);
             isWireframe = !isWireframe;
+            break;
+        case "KeyB":
+            toggleAccel = true;
             break;
         default:
             break;
@@ -227,7 +239,7 @@ function toggleWireframe(bool) {
             toggleWireframeNode(bool, child);
     });
     floor.material.wireframe = false; // Comment this line to dislay floor wireframe
-    wall.material.wireframe = false;
+    //wall.material.wireframe = false;
 }
 
 function toggleWireframeNode(bool, obj) {

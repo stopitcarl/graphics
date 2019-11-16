@@ -1,8 +1,8 @@
 // Constants
 let BALL_RADIUS = 2;
 let PERIM_RADIUS = 10;
-let MAX_VELOCITY = 3 * Math.PI / 180;
-let ACCELERATION = 0.01 * Math.PI / 180;
+let MAX_VELOCITY = 100 * Math.PI / 180;
+let ACCELERATION = 1 * Math.PI / 180;
 
 class Ball extends THREE.Mesh {
     constructor() {
@@ -19,7 +19,7 @@ class Ball extends THREE.Mesh {
             //color: 0x4083c7,
             map: texture,
             shininess: 100,
-            wireframe: false
+            wireframe: !isWireframe
         });
         super(geometry, material);
         this.init();
@@ -35,7 +35,7 @@ class Ball extends THREE.Mesh {
         this.acceleration = ACCELERATION;
     }
 
-    updatePhysics() {
+    updatePhysics(delta) {
         // Update velocity
         this.velocity += this.acceleration;
 
@@ -49,15 +49,15 @@ class Ball extends THREE.Mesh {
         var x = this.position.x;
         var z = this.position.z;
 
-        this.position.x = x * Math.cos(this.velocity) + z * Math.sin(this.velocity);
-        this.position.z = z * Math.cos(this.velocity) - x * Math.sin(this.velocity);
+        this.position.x = x * Math.cos(this.velocity * delta) + z * Math.sin(this.velocity * delta);
+        this.position.z = z * Math.cos(this.velocity * delta) - x * Math.sin(this.velocity * delta);
 
         // Update rotation
         var posAxis = this.position.clone().normalize();
         var yAxis = new THREE.Vector3(0, 1, 0);
 
-        this.rotateOnWorldAxis(posAxis, -1 * this.velocity);
-        this.rotateOnWorldAxis(yAxis, this.velocity);
+        this.rotateOnWorldAxis(posAxis, -1 * (this.velocity * PERIM_RADIUS / BALL_RADIUS) * delta);
+        this.rotateOnWorldAxis(yAxis, this.velocity * delta);
     }
 
     toggleAcceleration() {
