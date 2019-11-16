@@ -8,7 +8,8 @@ let cams = [],
 var floor,
     wall,
     painting,
-    icosad;
+    icosad,
+    dice;
 
 
 var isWireframe = true,
@@ -40,6 +41,9 @@ function init() {
      * ************************************************************************/
     floor = new Floor();
     scene.add(floor);
+
+    dice = new Dice();
+    scene.add(dice);
 
     /***************************************************************************
      * Cameras
@@ -140,6 +144,9 @@ function init() {
         light.children[0].shadow.camera.far = 30;
         light.children[0].shadow.camera.fov = 25;
     });
+
+    clock = new THREE.Clock(true);
+
 }
 
 function animate() {
@@ -153,7 +160,12 @@ function animate() {
 }
 
 function update() {
-    // TODO: rotate cube?
+
+    // Get delta
+    let delta = clock.getDelta();
+
+    dice.update(delta);
+
 }
 
 function onKeyDown(e) {
