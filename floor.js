@@ -18,7 +18,7 @@ class Floor extends THREE.Mesh {
         let material = new THREE.MeshBasicMaterial({
             //flatShading: true,
             color: 0x555555,
-            map: texture
+            // map: texture
             // wireframe: true
 
         });

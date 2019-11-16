@@ -39,11 +39,7 @@ function init() {
      * Objects
      * ************************************************************************/
     floor = new Floor();
-    scene.add(floor);    
-
-    icosad = new Icosahedron(0, -floor.getWidthZ() / 5);
-    scene.add(icosad);
-
+    scene.add(floor);
 
     /***************************************************************************
      * Cameras
@@ -73,6 +69,9 @@ function init() {
     directionalLight = new THREE.DirectionalLight(0xffffff, 2);
     directionalLight.position.set(-10, 10, 0)
     scene.add(directionalLight);
+
+    let lightA = new THREE.AmbientLight();
+    scene.add(lightA);
 
     /* Target */
     let targetDir = new THREE.Object3D();
@@ -141,13 +140,6 @@ function init() {
         light.children[0].shadow.camera.far = 30;
         light.children[0].shadow.camera.fov = 25;
     });
-
-    /* Objects */
-    // icosad.castShadow = true;
-    // icosad.children[0].castShadow = true;
-    // wall.receiveShadow = true;
-    // floor.receiveShadow = true;
-
 }
 
 function animate() {
@@ -165,13 +157,13 @@ function update() {
 }
 
 function onKeyDown(e) {
-    switch (e.code) {        
+    switch (e.code) {
         case "KeyQ":
             activeCam = cams[PERSP];
             break;
         case "KeyW":
             activeCam = cams[PAINT];
-            break;        
+            break;
         case "KeyK":
             toggleWireframe(isWireframe);
             isWireframe = !isWireframe;
@@ -200,15 +192,7 @@ function onResize() {
 
         let aspectRatio = window.innerWidth / window.innerHeight;
 
-        // resize perspective camera        
-        // if (aspectRatio < 1) {
-        //     cams[PERSP].fov = 45 / Math.sqrt(aspect);
-        // } else
-        //     cams[PERSP].fov = 45;
-
-
-        // resize orthogonal camera
-        let viewSize = painting.getWidth() + 2;
+        let viewSize = 30;
         if (aspectRatio > 1) {
             cams[PAINT].left = aspectRatio * viewSize / -2;
             cams[PAINT].right = aspectRatio * viewSize / 2;
@@ -222,15 +206,6 @@ function onResize() {
             cams[PAINT].bottom = viewSize / aspectRatio / -2;
             cams[PAINT].updateProjectionMatrix();
         }
-
-
-        // if (aspectRatio < 1) {
-        //     cams[PERSP].fov = 45 / Math.sqrt(aspect);
-        //     cams[PERSP].updateProjectionMatrix();
-        // } else {
-        //     cams[PERSP].fov = 45;
-        //     cams[PERSP].updateProjectionMatrix();
-        // }
     }
 }
 
