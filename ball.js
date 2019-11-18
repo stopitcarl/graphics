@@ -8,16 +8,14 @@ let Y_AXIS = new THREE.Vector3(0, 1, 0);
 class Ball extends THREE.Mesh {
     constructor() {
         // Creates texture
-        var texture = new THREE.TextureLoader().load("lenna.png");
-        /*texture.wrapS = THREE.RepeatWrapping;
+        var texture = new THREE.TextureLoader().load("assets/lenna.png");
+        texture.wrapS = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set(2, 2);*/
+        texture.repeat.set(2, 2);
 
         // Creates object
         let geometry = new THREE.SphereBufferGeometry(BALL_RADIUS, 20, 20);
         let phong = new THREE.MeshPhongMaterial({
-            //        flatShading: true,
-            //color: 0x4083c7,
             map: texture,
             shininess: 100
         });
@@ -25,6 +23,7 @@ class Ball extends THREE.Mesh {
         let basic = new THREE.MeshBasicMaterial({
             map: texture           
         });
+        
         super(geometry, phong);
         this.phongM = phong;
         this.basicM = basic;
@@ -77,8 +76,8 @@ class Ball extends THREE.Mesh {
     }
 
     wireframe(bool) {
-        this.basic.wireframe = bool;
-        this.phong.wireframe = bool;
+        this.basicM.wireframe = bool;
+        this.phongM.wireframe = bool;
         this.material.wireframe = bool;
     }
 }

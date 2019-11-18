@@ -2,22 +2,18 @@
 
 // Three js objects
 let cams = [],
-    activeCam, scene, renderer, directionalLight, pointLight, spotLights = [];
+    activeCam, mainCam, pauseCamera, activeScene, mainScene, pauseScene, renderer, directionalLight, pointLight;
 
 // Scene objects
 var floor,
-    wall,
-    painting,
     ball,
-    dice;
+    die;
 
 
-var clock,
-    timeElapsed = 0;
+var clock;
 
 // camera shortcuts
-let PERSP = 0,
-    PAINT = 1;
+let PERSP = 0;
 
 // flags
 let lightToggle = [],
@@ -34,39 +30,32 @@ function init() {
 
 
     // scene
-    scene = new THREE.Scene();
+    mainScene = new THREE.Scene();
+    pauseScene = new THREE.Scene();
+    activeScene = mainScene;
 
 
     /***************************************************************************
      * Objects
      * ************************************************************************/
     floor = new Floor();
-    scene.add(floor);
+    mainScene.add(floor);
 
-    dice = new Dice();
-    scene.add(dice);
+    die = new Die();
+    mainScene.add(die);
 
     ball = new Ball();
-    scene.add(ball);
+    mainScene.add(ball);
 
     /***************************************************************************
      * Cameras
      * ************************************************************************/
     // Perpective front camera (0)
-    let perspFront = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-    perspFront.position.set(-22, 12, 0);
-    perspFront.lookAt(scene.position);
-    cams.push(perspFront);
-    // Paint camera (1)
-    // viewSize = painting.getWidth() + 2;
-    // let aspectRatio = window.innerWidth / window.innerHeight;
-    // let cameraPaint = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
-    //     viewSize / 2, viewSize / -2, 0, 100);
-    // cameraPaint.position.set(painting_pos.x - 5, painting_pos.y, painting_pos.z);
-    // cameraPaint.lookAt(painting_pos);
-    // cams.push(cameraPaint);
-
-    activeCam = cams[PERSP];
+    mainCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    mainCam.position.set(-22, 12, 0);
+    mainCam.lookAt(mainScene.position);
+    cams.push(mainCam);
+    activeCam = mainCam;
 
     // ######### Lights ############
 
@@ -76,46 +65,15 @@ function init() {
 
     directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(-10, 10, 0)
-    scene.add(directionalLight);
+    mainScene.add(directionalLight);
     lightToggle.push(false);
-
-    // let lightA = new THREE.AmbientLight();
-    // scene.add(lightA);
 
     pointLight = new THREE.PointLight(0xffffff, 1.2);
     pointLight.position.set(-2, 6, -2);
-    scene.add(pointLight);
+    mainScene.add(pointLight);
     lightToggle.push(false);
 
-    /* Target */
-    // let targetDir = new THREE.Object3D();
-    // scene.add(targetDir);
-    // targetDir.position.set(0, 2, 0);
-    directionalLight.target = scene;
-    directionalLight.target.updateMatrixWorld();
-
-    /* Helper */
-    // let helper = new THREE.DirectionalLightHelper(directionalLight, 1);
-    // scene.add(helper);
-
-    /***************************************************************************
-     * SpotLights
-     **************************************************************************/
-
-    // let spotlight1 = new SpotLight(-10, 6, -7.5, -1 * Math.PI / 4, Math.PI / 4);
-    // spotLights.push(spotlight1);
-    // let spotlight2 = new SpotLight(10 - 0.5, 6, -7.5, -1 * Math.PI / 4, -1 * Math.PI / 4);
-    // spotLights.push(spotlight2);
-    // let spotlight3 = new SpotLight(10 - 0.5, 6, 7.5, Math.PI / 4, -1 * Math.PI / 4);
-    // spotLights.push(spotlight3);
-    // let spotlight4 = new SpotLight(-10, 6, 7.5, Math.PI / 4, Math.PI / 4);
-    // spotLights.push(spotlight4);
-    // lightOn.push(false);
-
-    // spotLights.forEach(light => {
-    //     scene.add(light);
-    //     lightOn.push(false);
-    // });
+    directionalLight.target = mainScene;
 
     // ######### Renderer ############
     renderer = new THREE.WebGLRenderer({
@@ -126,43 +84,30 @@ function init() {
     document.body.appendChild(renderer.domElement);
     window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
 
-    /***************************************************************************
-     * Shadows
-     **************************************************************************/
+    // ################## Pause Scene ##########################
+    let pauseObject = new Pause();
+    pauseScene.add(pauseObject);
 
-    renderer.shadowMap.enabled = true;
+    let viewSize = 20;
+    let aspectRatio = window.innerWidth / window.innerHeight;
+    pauseCamera = new THREE.OrthographicCamera(aspectRatio * viewSize / -2, aspectRatio * viewSize / 2,
+        viewSize / 2, viewSize / -2, 0, 30);
+    pauseCamera.position.set(0, 10, 0);
+    pauseCamera.lookAt(pauseObject.position);
+    cams.push(pauseCamera);
 
-    /* Directional light */
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
-    directionalLight.shadow.camera.near = 5;
-    directionalLight.shadow.camera.far = 20;
-    directionalLight.shadow.camera.left = -2.5;
-    directionalLight.shadow.camera.right = 2.5;
-    directionalLight.shadow.camera.top = 2.5;
-    directionalLight.shadow.camera.bottom = -2.5;
 
-    /* Spotlights */
-    spotLights.forEach(light => {
-        light.children[0].castShadow = true;
-        light.children[0].shadow.mapSize.width = 1024;
-        light.children[0].shadow.mapSize.height = 1024;
-        light.children[0].shadow.camera.near = 5;
-        light.children[0].shadow.camera.far = 30;
-        light.children[0].shadow.camera.fov = 25;
-    });
 
+    let lightA = new THREE.AmbientLight(2);
+    pauseScene.add(lightA);
 
     startup();
-
 }
 
 function startup() {
     clock = new THREE.Clock(true);
-    dice.init();
+    die.init();
     ball.init();
     floor.init();
     directionalLight.visible = pointLight.visible = true;
@@ -171,7 +116,8 @@ function startup() {
     pause = false;
     toggleWireframe(isWireframe);
     toggleMaterial(isPhong);
-
+    activeScene = mainScene;
+    activeCam = mainCam;
 }
 
 function animate() {
@@ -179,7 +125,7 @@ function animate() {
     // Update
     update();
     // Render
-    renderer.render(scene, activeCam);
+    renderer.render(activeScene, activeCam);
     // Setp up next render
     requestAnimationFrame(animate);
 }
@@ -191,7 +137,7 @@ function update() {
         return;
 
 
-    dice.update(delta);
+    die.update(delta);
     if (toggleAccel) {
         ball.toggleAcceleration();
         toggleAccel = false;
@@ -206,8 +152,6 @@ function update() {
         pointLight.visible = !pointLight.visible;
         lightToggle[1] = false;
     }
-
-
 }
 
 function onKeyDown(e) {
@@ -220,6 +164,13 @@ function onKeyDown(e) {
             break;
         case "KeyS":
             pause = !pause;
+            if (pause) {
+                activeScene = pauseScene;
+                activeCam = pauseCamera;
+            } else {
+                activeScene = mainScene;
+                activeCam = mainCam;
+            }
             break;
         case "KeyW":
             isWireframe = !isWireframe;
@@ -241,57 +192,50 @@ function onKeyDown(e) {
     }
 }
 
-function onKeyUp(e) {
-    switch (e.code) {
-        default:
-            break;
-    }
-}
-
 function onResize() {
     'use strict'
 
     if (window.innerHeight > 0 && window.innerWidth > 0) {
+        let aspectRatio = window.innerWidth / window.innerHeight;
         cams.forEach(cam => {
-            cam.aspect = window.innerWidth / window.innerHeight;
+            cam.aspect = aspectRatio;
             cam.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // let aspectRatio = window.innerWidth / window.innerHeight;
-
-        // let viewSize = 30;
-        // if (aspectRatio > 1) {
-        //     cams[PAINT].left = aspectRatio * viewSize / -2;
-        //     cams[PAINT].right = aspectRatio * viewSize / 2;
-        //     cams[PAINT].top = viewSize / 2;
-        //     cams[PAINT].bottom = viewSize / -2;
-        //     cams[PAINT].updateProjectionMatrix();
-        // } else {
-        //     cams[PAINT].left = viewSize / -2;
-        //     cams[PAINT].right = viewSize / 2;
-        //     cams[PAINT].top = viewSize / aspectRatio / 2;
-        //     cams[PAINT].bottom = viewSize / aspectRatio / -2;
-        //     cams[PAINT].updateProjectionMatrix();
-        // }
+        // resize orthogonal camera
+        let viewSize = 20;
+        if (aspectRatio > 1) {
+            pauseCamera.left = aspectRatio * viewSize / -2;
+            pauseCamera.right = aspectRatio * viewSize / 2;
+            pauseCamera.top = viewSize / 2;
+            pauseCamera.bottom = viewSize / -2;
+            pauseCamera.updateProjectionMatrix();
+        } else {
+            pauseCamera.left = viewSize / -2;
+            pauseCamera.right = viewSize / 2;
+            pauseCamera.top = viewSize / aspectRatio / 2;
+            pauseCamera.bottom = viewSize / aspectRatio / -2;
+            pauseCamera.updateProjectionMatrix();
+        }
     }
 }
 
 function toggleWireframe(bool) {
     console.log("wireframing", bool);
     floor.wireframe(bool);
-    // dice.wireframe(bool);
     ball.wireframe(bool);
+    die.wireFrame(bool);
 }
 
 function toggleMaterial(bool) {
     if (bool) {
         floor.phong();
-        // dice.phong();
+        die.phong();
         ball.phong();
     } else {
         floor.basic();
-        // dice.basic();
-        ball.basic();        
+        die.basic();
+        ball.basic();
     }
 }

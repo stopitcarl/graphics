@@ -28,7 +28,7 @@ class Floor extends THREE.Mesh {
         this.position.y = -FLOOR_HEIGHT / 2;
     }
 
-    init(){
+    init() {
         this.phong();
     }
 
@@ -41,9 +41,8 @@ class Floor extends THREE.Mesh {
     }
 
     wireframe(bool) {
-        this.basic.wireframe = bool;
-        this.phong.wireframe = bool;
-        this.material.wireframe = bool;
+        this.basicM.wireframe = bool;
+        this.phongM.wireframe = bool;
     }
 
 }
