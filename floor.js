@@ -13,16 +13,32 @@ class Floor extends THREE.Mesh {
         // colorTexture.wrapS = THREE.MirroredRepeatWrapping;
         // colorTexture.wrapT = THREE.MirroredRepeatWrapping;
         // diceTexture.wrapS = THREE.MirroredRepeatWrapping;
-        let material = new THREE.MeshPhongMaterial({
-            //flatShading: true,
-            //  color: 0x555555,
+        let phong = new THREE.MeshPhongMaterial({
             map: colorTexture,
             bumpMap: bumpTexture
-            //wireframe: true
         });
+        let basic = new THREE.MeshBasicMaterial({
+            map: colorTexture
+        });;
 
-        super(geometry, material);
 
+        super(geometry, phong);
+        this.phongM = phong;
+        this.basicM = basic;
         this.position.y = -FLOOR_HEIGHT / 2;
     }
+
+    phong() {
+        this.material = this.phongM;
+    }
+
+    basic() {
+        this.material = this.basicM;
+    }
+
+    wireframe(bool) {
+        this.basic.wireframe = bool;
+        this.phong.wireframe = bool;
+    }
+
 }

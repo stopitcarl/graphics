@@ -19,8 +19,7 @@ class Ball extends THREE.Mesh {
             //        flatShading: true,
             //color: 0x4083c7,
             map: texture,
-            shininess: 100,
-            wireframe: !isWireframe
+            shininess: 100
         });
         super(geometry, material);
         this.init();

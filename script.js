@@ -12,8 +12,7 @@ var floor,
     dice;
 
 
-var isWireframe = true,
-    clock,
+var clock,
     timeElapsed = 0;
 
 // camera shortcuts
@@ -21,10 +20,11 @@ let PERSP = 0,
     PAINT = 1;
 
 // flags
-let lightOn = [],
-    isBasic = false,
-    isLambert = false,
-    toggleAccel = false;
+let lightToggle = [],
+    isWireframe = false,
+    isPhong = true,
+    toggleAccel = false,
+    pause = false;
 
 
 init();
@@ -74,22 +74,24 @@ function init() {
      * Directional Light
      * ************************************************************************/
 
-    directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(-10, 10, 0)
     scene.add(directionalLight);
+    lightToggle.push(false);
 
     // let lightA = new THREE.AmbientLight();
     // scene.add(lightA);
 
-    pointLight = new THREE.PointLight();
-    pointLight.position.set(4, 4, -3);
+    pointLight = new THREE.PointLight(0xffffff, 1.2);
+    pointLight.position.set(-2, 6, -2);
     scene.add(pointLight);
+    lightToggle.push(false);
 
     /* Target */
-    let targetDir = new THREE.Object3D();
-    scene.add(targetDir);
-    targetDir.position.set(0, 2, 0);
-    directionalLight.target = targetDir;
+    // let targetDir = new THREE.Object3D();
+    // scene.add(targetDir);
+    // targetDir.position.set(0, 2, 0);
+    directionalLight.target = scene;
     directionalLight.target.updateMatrixWorld();
 
     /* Helper */
@@ -153,7 +155,20 @@ function init() {
         light.children[0].shadow.camera.fov = 25;
     });
 
+
+    startup();
+
+}
+
+function startup() {
     clock = new THREE.Clock(true);
+    dice.init();
+    ball.init();
+    directionalLight.visible = pointLight.visible = true;
+    isWireframe = false;
+    isPhong = true;
+    toggleWireframe(isWireframe);
+    toggleMaterial(isPhong);
 
 }
 
@@ -170,7 +185,12 @@ function animate() {
 function update() {
 
     // Get delta
+
+
     let delta = clock.getDelta();
+    if (pause)
+        delta = 0;
+
 
     dice.update(delta);
     if (toggleAccel) {
@@ -179,19 +199,39 @@ function update() {
     }
     ball.updatePhysics(delta);
 
+    if (lightToggle[0]) {
+        directionalLight.visible = !directionalLight.visible;
+        lightToggle[0] = false;
+    }
+    if (lightToggle[1]) {
+        pointLight.visible = !pointLight.visible;
+        lightToggle[1] = false;
+    }
+
 }
 
 function onKeyDown(e) {
     switch (e.code) {
-        case "KeyQ":
-            activeCam = cams[PERSP];
+        case "KeyD":
+            lightToggle[0] = !lightToggle[0];            
+            break;
+        case "KeyP":
+            lightToggle[1] = !lightToggle[1];            
+            break;
+        case "KeyS":            
+            pause = !pause;
             break;
         case "KeyW":
-            activeCam = cams[PAINT];
-            break;
-        case "KeyK":
-            toggleWireframe(isWireframe);
             isWireframe = !isWireframe;
+            toggleWireframe(isWireframe);
+            break;
+        case "KeyL":
+            isPhong = !isPhong;
+            toggleMaterial(isPhong);
+            break;
+        case "KeyR":
+            if (pause)
+                startup();
             break;
         case "KeyB":
             toggleAccel = true;
@@ -237,20 +277,20 @@ function onResize() {
     }
 }
 
-function toggleWireframe(bool) {
-    scene.children.forEach(child => {
-        if (child.type === "Mesh")
-            toggleWireframeNode(bool, child);
-    });
-    floor.material.wireframe = false; // Comment this line to dislay floor wireframe
-    //wall.material.wireframe = false;
+function toggleWireframe(bool) {    
+    floor.wireframe(bool);
+    // dice.wireframe(bool);
+    // ball.wireframe(bool);
 }
 
-function toggleWireframeNode(bool, obj) {
-    if (obj.type != "Mesh")
-        return;
-    obj.material.wireframe = bool;
-    obj.children.forEach(child => {
-        toggleWireframeNode(bool, child);
-    });
+function toggleMaterial(bool) {
+    if (bool) {
+        floor.phong();
+        // dice.phong();
+        // ball.phong();
+    } else {
+        floor.basic();
+        // dice.basic();
+        // ball.basic();        
+    }
 }
