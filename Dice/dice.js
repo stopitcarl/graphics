@@ -1,5 +1,6 @@
 let SIDE = 2.5;
 let SPEED = 0.5;
+let FACES = 6;
 /* ROTATEZ = -2arctg(sqrt(2) - sqrt(3)) */
 let ROTATEZ = 0.6154797087
 let xAxis = new THREE.Vector3(1, 0, 0);
@@ -11,7 +12,9 @@ class Dice extends THREE.Mesh {
     constructor() {
 
         let geometry = new THREE.BoxGeometry(SIDE, SIDE, SIDE);
-        let material = [ 
+
+        /* Phong */
+        let phong = [ 
             new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load("Dice/texture/1.png"), bumpMap: new THREE.TextureLoader().load("Dice/bump/1.png")}),
             new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load("Dice/texture/2.png"), bumpMap: new THREE.TextureLoader().load("Dice/bump/2.png")}),
             new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load("Dice/texture/3.png"), bumpMap: new THREE.TextureLoader().load("Dice/bump/3.png")}),
@@ -20,9 +23,21 @@ class Dice extends THREE.Mesh {
             new THREE.MeshPhongMaterial({map: new THREE.TextureLoader().load("Dice/texture/6.png"), bumpMap: new THREE.TextureLoader().load("Dice/bump/6.png")}),
         ];
 
-        super(geometry, material);
-        this.init();
+        /* Basic */
+        let basic = [
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("Dice/texture/1.png")}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("Dice/texture/2.png")}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("Dice/texture/3.png")}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("Dice/texture/4.png")}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("Dice/texture/5.png")}),
+            new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("Dice/texture/6.png")}),
+        ];
 
+        super(geometry, phong);
+        this.phongM = phong;
+        this.basicM = basic;
+        this.init();
+        
     }
 
     init() {
@@ -35,8 +50,23 @@ class Dice extends THREE.Mesh {
         this.position.set(0, SIDE * Math.sqrt(3) / 2 + FLOOR_HEIGHT / 2, 0);
     }
 
+    phong() {
+        this.material = this.phongM;
+    }
+
+    basic() {
+        this.material = this.basicM;
+    }
+
     update(delta) {
         this.rotateOnWorldAxis(yAxis, SPEED * delta);
+    }
+
+    wireFrame() {
+        for (let i = 0; i < FACES; i++) {
+            this.phongM[i].wireframe = true;
+            this.basicM[i].wireframe = true;
+        }
     }
 
 }
