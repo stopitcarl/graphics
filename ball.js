@@ -1,8 +1,9 @@
 // Constants
 let BALL_RADIUS = 2;
-let PERIM_RADIUS = 10;
+let PERIM_RADIUS = 8;
 let MAX_VELOCITY = 100 * Math.PI / 180;
 let ACCELERATION = 1 * Math.PI / 180;
+let Y_AXIS = new THREE.Vector3(0, 1, 0);
 
 class Ball extends THREE.Mesh {
     constructor() {
@@ -54,10 +55,9 @@ class Ball extends THREE.Mesh {
 
         // Update rotation
         var posAxis = this.position.clone().normalize();
-        var yAxis = new THREE.Vector3(0, 1, 0);
 
         this.rotateOnWorldAxis(posAxis, -1 * (this.velocity * PERIM_RADIUS / BALL_RADIUS) * delta);
-        this.rotateOnWorldAxis(yAxis, this.velocity * delta);
+        this.rotateOnWorldAxis(Y_AXIS, this.velocity * delta);
     }
 
     toggleAcceleration() {

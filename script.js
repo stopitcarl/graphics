@@ -2,7 +2,7 @@
 
 // Three js objects
 let cams = [],
-    activeCam, scene, renderer, directionalLight, spotLights = [];
+    activeCam, scene, renderer, directionalLight, pointLight, spotLights = [];
 
 // Scene objects
 var floor,
@@ -74,12 +74,16 @@ function init() {
      * Directional Light
      * ************************************************************************/
 
-    directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
     directionalLight.position.set(-10, 10, 0)
     scene.add(directionalLight);
 
-    let lightA = new THREE.AmbientLight();
-    scene.add(lightA);
+    // let lightA = new THREE.AmbientLight();
+    // scene.add(lightA);
+
+    pointLight = new THREE.PointLight();
+    pointLight.position.set(4, 4, -3);
+    scene.add(pointLight);
 
     /* Target */
     let targetDir = new THREE.Object3D();
@@ -116,7 +120,7 @@ function init() {
         antialias: true,
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = false;
     document.body.appendChild(renderer.domElement);
     window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKeyDown);
@@ -214,22 +218,22 @@ function onResize() {
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        let aspectRatio = window.innerWidth / window.innerHeight;
+        // let aspectRatio = window.innerWidth / window.innerHeight;
 
-        let viewSize = 30;
-        if (aspectRatio > 1) {
-            cams[PAINT].left = aspectRatio * viewSize / -2;
-            cams[PAINT].right = aspectRatio * viewSize / 2;
-            cams[PAINT].top = viewSize / 2;
-            cams[PAINT].bottom = viewSize / -2;
-            cams[PAINT].updateProjectionMatrix();
-        } else {
-            cams[PAINT].left = viewSize / -2;
-            cams[PAINT].right = viewSize / 2;
-            cams[PAINT].top = viewSize / aspectRatio / 2;
-            cams[PAINT].bottom = viewSize / aspectRatio / -2;
-            cams[PAINT].updateProjectionMatrix();
-        }
+        // let viewSize = 30;
+        // if (aspectRatio > 1) {
+        //     cams[PAINT].left = aspectRatio * viewSize / -2;
+        //     cams[PAINT].right = aspectRatio * viewSize / 2;
+        //     cams[PAINT].top = viewSize / 2;
+        //     cams[PAINT].bottom = viewSize / -2;
+        //     cams[PAINT].updateProjectionMatrix();
+        // } else {
+        //     cams[PAINT].left = viewSize / -2;
+        //     cams[PAINT].right = viewSize / 2;
+        //     cams[PAINT].top = viewSize / aspectRatio / 2;
+        //     cams[PAINT].bottom = viewSize / aspectRatio / -2;
+        //     cams[PAINT].updateProjectionMatrix();
+        // }
     }
 }
 
