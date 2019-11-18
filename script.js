@@ -167,6 +167,7 @@ function startup() {
     directionalLight.visible = pointLight.visible = true;
     isWireframe = false;
     isPhong = true;
+    pause = false;
     toggleWireframe(isWireframe);
     toggleMaterial(isPhong);
 
@@ -213,12 +214,12 @@ function update() {
 function onKeyDown(e) {
     switch (e.code) {
         case "KeyD":
-            lightToggle[0] = !lightToggle[0];            
+            lightToggle[0] = !lightToggle[0];
             break;
         case "KeyP":
-            lightToggle[1] = !lightToggle[1];            
+            lightToggle[1] = !lightToggle[1];
             break;
-        case "KeyS":            
+        case "KeyS":
             pause = !pause;
             break;
         case "KeyW":
@@ -277,7 +278,8 @@ function onResize() {
     }
 }
 
-function toggleWireframe(bool) {    
+function toggleWireframe(bool) {
+    console.log("wireframing", bool);
     floor.wireframe(bool);
     // dice.wireframe(bool);
     // ball.wireframe(bool);

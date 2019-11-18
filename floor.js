@@ -39,6 +39,7 @@ class Floor extends THREE.Mesh {
     wireframe(bool) {
         this.basic.wireframe = bool;
         this.phong.wireframe = bool;
+        this.material.wireframe = bool;
     }
 
 }
