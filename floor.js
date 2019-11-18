@@ -28,6 +28,10 @@ class Floor extends THREE.Mesh {
         this.position.y = -FLOOR_HEIGHT / 2;
     }
 
+    init(){
+        this.phong();
+    }
+
     phong() {
         this.material = this.phongM;
     }

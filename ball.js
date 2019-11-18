@@ -1,38 +1,41 @@
 // Constants
-let BALL_RADIUS = 2;
+let BALL_RADIUS = 3;
 let PERIM_RADIUS = 8;
-let MAX_VELOCITY = 100 * Math.PI / 180;
+let MAX_VELOCITY = 80 * Math.PI / 180;
 let ACCELERATION = 1 * Math.PI / 180;
 let Y_AXIS = new THREE.Vector3(0, 1, 0);
 
 class Ball extends THREE.Mesh {
     constructor() {
         // Creates texture
-        var texture = new THREE.TextureLoader().load("brisson.png");
+        var texture = new THREE.TextureLoader().load("lenna.png");
         /*texture.wrapS = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
         texture.repeat.set(2, 2);*/
 
         // Creates object
         let geometry = new THREE.SphereBufferGeometry(BALL_RADIUS, 20, 20);
-        let material = new THREE.MeshPhongMaterial({
+        let phong = new THREE.MeshPhongMaterial({
             //        flatShading: true,
             //color: 0x4083c7,
             map: texture,
             shininess: 100
         });
-        super(geometry, material);
+
+        let basic = new THREE.MeshBasicMaterial({
+            map: texture           
+        });
+        super(geometry, phong);
+        this.phongM = phong;
+        this.basicM = basic;
         this.init();
-        var axesHelper = new THREE.AxesHelper(1);
-        this.add(axesHelper);
-        this.axisHelp = axesHelper;
-        this.axisHelp.visible = true;
     }
 
     init() {
         this.position.set(PERIM_RADIUS, BALL_RADIUS, 0);
         this.velocity = 0;
         this.acceleration = ACCELERATION;
+        this.phong();
     }
 
     updatePhysics(delta) {
@@ -53,7 +56,9 @@ class Ball extends THREE.Mesh {
         this.position.z = z * Math.cos(this.velocity * delta) - x * Math.sin(this.velocity * delta);
 
         // Update rotation
-        var posAxis = this.position.clone().normalize();
+        var posAxis = this.position.clone();
+        posAxis.y = 0;
+        posAxis.normalize()
 
         this.rotateOnWorldAxis(posAxis, -1 * (this.velocity * PERIM_RADIUS / BALL_RADIUS) * delta);
         this.rotateOnWorldAxis(Y_AXIS, this.velocity * delta);
@@ -61,5 +66,19 @@ class Ball extends THREE.Mesh {
 
     toggleAcceleration() {
         this.acceleration *= -1;
+    }
+
+    phong() {
+        this.material = this.phongM;
+    }
+
+    basic() {
+        this.material = this.basicM;
+    }
+
+    wireframe(bool) {
+        this.basic.wireframe = bool;
+        this.phong.wireframe = bool;
+        this.material.wireframe = bool;
     }
 }

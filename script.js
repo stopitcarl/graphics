@@ -164,6 +164,7 @@ function startup() {
     clock = new THREE.Clock(true);
     dice.init();
     ball.init();
+    floor.init();
     directionalLight.visible = pointLight.visible = true;
     isWireframe = false;
     isPhong = true;
@@ -185,12 +186,9 @@ function animate() {
 
 function update() {
 
-    // Get delta
-
-
     let delta = clock.getDelta();
     if (pause)
-        delta = 0;
+        return;
 
 
     dice.update(delta);
@@ -208,6 +206,7 @@ function update() {
         pointLight.visible = !pointLight.visible;
         lightToggle[1] = false;
     }
+
 
 }
 
@@ -282,17 +281,17 @@ function toggleWireframe(bool) {
     console.log("wireframing", bool);
     floor.wireframe(bool);
     // dice.wireframe(bool);
-    // ball.wireframe(bool);
+    ball.wireframe(bool);
 }
 
 function toggleMaterial(bool) {
     if (bool) {
         floor.phong();
         // dice.phong();
-        // ball.phong();
+        ball.phong();
     } else {
         floor.basic();
         // dice.basic();
-        // ball.basic();        
+        ball.basic();        
     }
 }
