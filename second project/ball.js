@@ -11,11 +11,18 @@ var zAxis = new THREE.Vector3(0, 0, 1);
 
 class Ball extends THREE.Mesh {
     constructor(pos, vel) {
+        // Creates texture
+        var texture = new THREE.TextureLoader().load("brisson.jpg");
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        //texture.repeat.set(2, 2);
+
         // 5x2.5 car with 0.5 radius wheels
-        let geometry = new THREE.SphereBufferGeometry(BALL_RADIUS, 8, 8);
+        let geometry = new THREE.SphereBufferGeometry(BALL_RADIUS, 20, 20);
         let material = new THREE.MeshBasicMaterial({
             //        flatShading: true,
-            color: 0x4083c7,
+            //color: 0x4083c7,
+            map: texture,
             wireframe: !isWireframe
         });
         super(geometry, material);
@@ -51,8 +58,8 @@ class Ball extends THREE.Mesh {
         let m2 = ball.mass;
 
 
-        let dist1 = this.position.clone().sub(ball.position); // (x1- x2)        
-        let dist2 = ball.position.clone().sub(this.position); // (x1- x2)        
+        let dist1 = this.position.clone().sub(ball.position); // (x1- x2)
+        let dist2 = ball.position.clone().sub(this.position); // (x1- x2)
 
         let difv1 = this.velocity.clone().sub(ball.velocity); // (v1-v2)
         let difv2 = difv1.clone().negate(); // (v2-v1)
@@ -65,8 +72,8 @@ class Ball extends THREE.Mesh {
         this.velocity.sub(dist1.multiplyScalar(vn));
         ball.velocity.sub(dist2.multiplyScalar(vn2));
 
-        /*  
-            
+        /*
+
         // Inelastic collision:
 
         // If balls are touching
@@ -106,7 +113,7 @@ class Ball extends THREE.Mesh {
         // Update position
         this.position.addScaledVector(this.velocity, delta);
 
-        // Update rotation                
+        // Update rotation
         this.rotateOnWorldAxis(zAxis, -this.velocity.x * delta / BALL_RADIUS);
         this.rotateOnWorldAxis(xAxis, this.velocity.z * delta / BALL_RADIUS);
 
